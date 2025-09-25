@@ -1,10 +1,16 @@
-import { useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { Navigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { Navigate } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   Calendar,
   Users,
@@ -21,15 +27,27 @@ import {
   HelpCircle,
   BookOpen,
   Video,
-} from 'lucide-react';
-import Navigation from '@/components/Navigation';
-import Footer from '@/components/Footer';
-import TradeJobs from '@/components/Trade-CRM/TradeJobs';
-import TradeLeads from '@/components/Trade-CRM/TradeLeads';
+} from "lucide-react";
+import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
+import TradeJobs from "@/components/Trade-CRM/TradeJobs";
+import TradeLeads from "@/components/Trade-CRM/TradeLeads";
+import { useQuery } from "@tanstack/react-query";
+import { fetchLeads } from "@/lib/api";
 
 const TradesCRM = () => {
   const { isAuthenticated, loading, isTrade } = useAuth();
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState("dashboard");
+
+  const {
+    data: leadsData,
+    isLoading: leadsLoading,
+    error: leadsErros,
+    refetch: refetchLeads,
+  } = useQuery({
+    queryKey: ["fetchLeads"],
+    queryFn: fetchLeads,
+  });
 
   if (loading) {
     return (
@@ -50,64 +68,43 @@ const TradesCRM = () => {
 
   // Mock data for the dashboard
   const stats = [
-    { title: 'Active Leads', value: '24', icon: Users, trend: '+12%' },
-    { title: 'Jobs This Month', value: '18', icon: Briefcase, trend: '+8%' },
-    { title: 'Revenue', value: '£8,450', icon: DollarSign, trend: '+15%' },
-    { title: 'Completion Rate', value: '94%', icon: TrendingUp, trend: '+2%' },
+    { title: "Active Leads", value: "24", icon: Users, trend: "+12%" },
+    { title: "Jobs This Month", value: "18", icon: Briefcase, trend: "+8%" },
+    { title: "Revenue", value: "£8,450", icon: DollarSign, trend: "+15%" },
+    { title: "Completion Rate", value: "94%", icon: TrendingUp, trend: "+2%" },
   ];
 
   const upcomingAppointments = [
-    { time: '9:00 AM', client: 'Sarah Johnson', service: 'Bathroom Survey', location: 'Manchester' },
-    { time: '2:00 PM', client: 'Mike Thompson', service: 'Kitchen Consultation', location: 'Liverpool' },
-    { time: '4:30 PM', client: 'Emma Davis', service: 'Plumbing Repair', location: 'Birmingham' },
-  ];
-
-  const leads = [
     {
-      id: 1,
-      name: 'Sarah Johnson',
-      location: 'Manchester',
-      service: 'Bathroom Renovation',
-      value: '£3,200',
-      status: 'hot',
-      lastContact: '2 hours ago',
-      phone: '07123 456 789',
-      email: 'sarah.j@email.com',
+      time: "9:00 AM",
+      client: "Sarah Johnson",
+      service: "Bathroom Survey",
+      location: "Manchester",
     },
     {
-      id: 2,
-      name: 'Mike Thompson',
-      location: 'Liverpool',
-      service: 'Kitchen Installation',
-      value: '£5,500',
-      status: 'warm',
-      lastContact: '1 day ago',
-      phone: '07234 567 890',
-      email: 'mike.t@email.com',
+      time: "2:00 PM",
+      client: "Mike Thompson",
+      service: "Kitchen Consultation",
+      location: "Liverpool",
     },
     {
-      id: 3,
-      name: 'Emma Davis',
-      location: 'Birmingham',
-      service: 'Plumbing Repair',
-      value: '£450',
-      status: 'cold',
-      lastContact: '3 days ago',
-      phone: '07345 678 901',
-      email: 'emma.d@email.com',
+      time: "4:30 PM",
+      client: "Emma Davis",
+      service: "Plumbing Repair",
+      location: "Birmingham",
     },
   ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'hot':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
-      case 'warm':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300';
-      case 'cold':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+      case "hot":
+        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
+      case "warm":
+        return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300";
+      case "cold":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300";
     }
   };
 
@@ -119,8 +116,12 @@ const TradesCRM = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Trade Pilot for Business</h1>
-            <p className="text-muted-foreground mt-1">Your professional dashboard</p>
+            <h1 className="text-2xl font-bold text-foreground">
+              Trade Pilot for Business
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Your professional dashboard
+            </p>
           </div>
           <div className="flex items-center gap-4">
             <Button variant="outline" size="icon">
@@ -138,20 +139,29 @@ const TradesCRM = () => {
 
         {/* Navigation Tabs */}
         <div className="flex gap-4 mb-6 border-b">
-          {['dashboard', 'leads', 'jobs', 'calendar', 'reviews', 'support', 'settings'].map(tab => (
+          {[
+            "dashboard",
+            "leads",
+            "jobs",
+            "calendar",
+            "reviews",
+            "support",
+            "settings",
+          ].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`pb-2 px-1 border-b-2 transition-colors capitalize ${
-                activeTab === tab ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              {tab === 'reviews' ? 'Reviews & Reputation' : tab}
+                activeTab === tab
+                  ? "border-primary text-primary"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}>
+              {tab === "reviews" ? "Reviews & Reputation" : tab}
             </button>
           ))}
         </div>
 
-        {activeTab === 'dashboard' && (
+        {activeTab === "dashboard" && (
           <div className="space-y-6">
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -160,7 +170,9 @@ const TradesCRM = () => {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-muted-foreground">{stat.title}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {stat.title}
+                        </p>
                         <p className="text-2xl font-bold">{stat.value}</p>
                         <p className="text-sm text-green-600">{stat.trend}</p>
                       </div>
@@ -179,19 +191,31 @@ const TradesCRM = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {leads.slice(0, 3).map(lead => (
-                      <div key={lead.id} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div>
-                          <h4 className="font-medium">{lead.name}</h4>
-                          <p className="text-sm text-muted-foreground">{lead.service}</p>
-                          <p className="text-sm text-muted-foreground">{lead.location}</p>
+                    {leadsData &&
+                      leadsData.length !== 0 &&
+                      leadsData.slice(0, 3).map((lead) => (
+                        <div
+                          key={lead.id}
+                          className="flex items-center justify-between p-3 border rounded-lg">
+                          <div>
+                            <h4 className="font-medium">{lead.name}</h4>
+                            <p className="text-sm text-muted-foreground">
+                              {lead.service}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {lead.location}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <Badge className={getStatusColor(lead.badge)}>
+                              {lead.badge}
+                            </Badge>
+                            <p className="text-sm font-medium mt-1">
+                              £{lead?.value ? lead?.value : "0"}
+                            </p>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <Badge className={getStatusColor(lead.status)}>{lead.status}</Badge>
-                          <p className="text-sm font-medium mt-1">{lead.value}</p>
-                        </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 </CardContent>
               </Card>
@@ -203,14 +227,20 @@ const TradesCRM = () => {
                 <CardContent>
                   <div className="space-y-4">
                     {upcomingAppointments.map((appointment, index) => (
-                      <div key={index} className="flex items-center gap-4 p-3 border rounded-lg">
+                      <div
+                        key={index}
+                        className="flex items-center gap-4 p-3 border rounded-lg">
                         <div className="text-center">
                           <Clock className="h-4 w-4 text-primary mx-auto" />
-                          <p className="text-sm font-medium">{appointment.time}</p>
+                          <p className="text-sm font-medium">
+                            {appointment.time}
+                          </p>
                         </div>
                         <div className="flex-1">
                           <h4 className="font-medium">{appointment.client}</h4>
-                          <p className="text-sm text-muted-foreground">{appointment.service}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {appointment.service}
+                          </p>
                           <p className="text-sm text-muted-foreground flex items-center gap-1">
                             <MapPin className="h-3 w-3" />
                             {appointment.location}
@@ -225,11 +255,11 @@ const TradesCRM = () => {
           </div>
         )}
 
-        {activeTab === 'leads' && <TradeLeads />}
+        {activeTab === "leads" && <TradeLeads />}
 
-        {activeTab === 'jobs' && <TradeJobs />}
+        {activeTab === "jobs" && <TradeJobs />}
 
-        {activeTab === 'calendar' && (
+        {activeTab === "calendar" && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold">Calendar & Schedule</h2>
@@ -258,11 +288,15 @@ const TradesCRM = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-7 gap-2 mb-4">
-                      {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                        <div key={day} className="text-center text-sm font-medium text-muted-foreground p-2">
-                          {day}
-                        </div>
-                      ))}
+                      {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
+                        (day) => (
+                          <div
+                            key={day}
+                            className="text-center text-sm font-medium text-muted-foreground p-2">
+                            {day}
+                          </div>
+                        )
+                      )}
                     </div>
 
                     <div className="grid grid-cols-7 gap-2">
@@ -270,20 +304,33 @@ const TradesCRM = () => {
                         const date = i - 6; // Start from previous month
                         const isCurrentMonth = date > 0 && date <= 31;
                         const isToday = date === 12;
-                        const hasAppointment = [10, 12, 15, 18, 20, 25].includes(date);
+                        const hasAppointment = [
+                          10, 12, 15, 18, 20, 25,
+                        ].includes(date);
 
                         return (
                           <div
                             key={i}
                             className={`h-16 p-1 border rounded text-sm ${
-                              isCurrentMonth ? 'bg-background' : 'bg-muted/50 text-muted-foreground'
-                            } ${isToday ? 'bg-primary text-primary-foreground' : ''}
-                            ${hasAppointment ? 'border-primary' : ''}`}
-                          >
-                            <div className="font-medium">{isCurrentMonth ? date : ''}</div>
+                              isCurrentMonth
+                                ? "bg-background"
+                                : "bg-muted/50 text-muted-foreground"
+                            } ${
+                              isToday
+                                ? "bg-primary text-primary-foreground"
+                                : ""
+                            }
+                            ${hasAppointment ? "border-primary" : ""}`}>
+                            <div className="font-medium">
+                              {isCurrentMonth ? date : ""}
+                            </div>
                             {hasAppointment && isCurrentMonth && (
                               <div className="text-xs bg-secondary text-secondary-foreground rounded px-1 mt-1">
-                                {date === 12 ? '3 jobs' : date === 15 ? '2 jobs' : '1 job'}
+                                {date === 12
+                                  ? "3 jobs"
+                                  : date === 15
+                                  ? "2 jobs"
+                                  : "1 job"}
                               </div>
                             )}
                           </div>
@@ -299,7 +346,9 @@ const TradesCRM = () => {
                 {/* Today's Appointments */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">Today's Appointments</CardTitle>
+                    <CardTitle className="text-lg">
+                      Today's Appointments
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
@@ -307,10 +356,14 @@ const TradesCRM = () => {
                         <div key={index} className="p-3 border rounded-lg">
                           <div className="flex items-center gap-3 mb-2">
                             <Clock className="h-4 w-4 text-primary" />
-                            <span className="font-medium">{appointment.time}</span>
+                            <span className="font-medium">
+                              {appointment.time}
+                            </span>
                           </div>
                           <h4 className="font-medium">{appointment.client}</h4>
-                          <p className="text-sm text-muted-foreground">{appointment.service}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {appointment.service}
+                          </p>
                           <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
                             <MapPin className="h-3 w-3" />
                             {appointment.location}
@@ -329,11 +382,15 @@ const TradesCRM = () => {
                   <CardContent>
                     <div className="space-y-3">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Appointments</span>
+                        <span className="text-muted-foreground">
+                          Appointments
+                        </span>
                         <span className="font-medium">12</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Completed Jobs</span>
+                        <span className="text-muted-foreground">
+                          Completed Jobs
+                        </span>
                         <span className="font-medium">8</span>
                       </div>
                       <div className="flex justify-between">
@@ -341,7 +398,9 @@ const TradesCRM = () => {
                         <span className="font-medium">£2,340</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Travel Time</span>
+                        <span className="text-muted-foreground">
+                          Travel Time
+                        </span>
                         <span className="font-medium">6.5 hrs</span>
                       </div>
                     </div>
@@ -356,7 +415,9 @@ const TradesCRM = () => {
                       alt="Digital planning workspace"
                       className="w-full h-32 object-cover rounded-lg"
                     />
-                    <p className="text-sm text-muted-foreground mt-2 text-center">Smart scheduling for your trade business</p>
+                    <p className="text-sm text-muted-foreground mt-2 text-center">
+                      Smart scheduling for your trade business
+                    </p>
                   </CardContent>
                 </Card>
               </div>
@@ -364,7 +425,7 @@ const TradesCRM = () => {
           </div>
         )}
 
-        {activeTab === 'reviews' && (
+        {activeTab === "reviews" && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold">Reviews & Reputation</h2>
@@ -376,7 +437,9 @@ const TradesCRM = () => {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">Overall Rating</p>
+                      <p className="text-sm text-muted-foreground">
+                        Overall Rating
+                      </p>
                       <p className="text-2xl font-bold flex items-center gap-1">
                         4.8 <span className="text-yellow-500">★</span>
                       </p>
@@ -389,7 +452,9 @@ const TradesCRM = () => {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">Total Reviews</p>
+                      <p className="text-sm text-muted-foreground">
+                        Total Reviews
+                      </p>
                       <p className="text-2xl font-bold">127</p>
                       <p className="text-sm text-green-600">+12 this month</p>
                     </div>
@@ -400,7 +465,9 @@ const TradesCRM = () => {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">Response Rate</p>
+                      <p className="text-sm text-muted-foreground">
+                        Response Rate
+                      </p>
                       <p className="text-2xl font-bold">98%</p>
                       <p className="text-sm text-green-600">+3% this month</p>
                     </div>
@@ -411,7 +478,9 @@ const TradesCRM = () => {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">Repeat Customers</p>
+                      <p className="text-sm text-muted-foreground">
+                        Repeat Customers
+                      </p>
                       <p className="text-2xl font-bold">34%</p>
                       <p className="text-sm text-green-600">+8% this month</p>
                     </div>
@@ -431,23 +500,35 @@ const TradesCRM = () => {
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <h4 className="font-medium">Sarah Johnson</h4>
-                          <p className="text-sm text-muted-foreground">Bathroom Renovation</p>
+                          <p className="text-sm text-muted-foreground">
+                            Bathroom Renovation
+                          </p>
                         </div>
                         <div className="flex text-yellow-500">★★★★★</div>
                       </div>
-                      <p className="text-sm">"Excellent work! Professional and on time."</p>
-                      <p className="text-xs text-muted-foreground mt-1">2 days ago</p>
+                      <p className="text-sm">
+                        "Excellent work! Professional and on time."
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        2 days ago
+                      </p>
                     </div>
                     <div className="border-b pb-4">
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <h4 className="font-medium">Mike Thompson</h4>
-                          <p className="text-sm text-muted-foreground">Emergency Plumbing</p>
+                          <p className="text-sm text-muted-foreground">
+                            Emergency Plumbing
+                          </p>
                         </div>
                         <div className="flex text-yellow-500">★★★★★</div>
                       </div>
-                      <p className="text-sm">"Quick response and fair pricing."</p>
-                      <p className="text-xs text-muted-foreground mt-1">1 week ago</p>
+                      <p className="text-sm">
+                        "Quick response and fair pricing."
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        1 week ago
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -459,7 +540,9 @@ const TradesCRM = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-center">
-                    <div className="text-4xl font-bold text-primary mb-2">9.6/10</div>
+                    <div className="text-4xl font-bold text-primary mb-2">
+                      9.6/10
+                    </div>
                     <p className="text-muted-foreground mb-4">Excellent</p>
                     <div className="space-y-2 text-left">
                       <div className="flex justify-between">
@@ -482,7 +565,7 @@ const TradesCRM = () => {
           </div>
         )}
 
-        {activeTab === 'support' && (
+        {activeTab === "support" && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold">Support Centre</h2>
@@ -498,8 +581,12 @@ const TradesCRM = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground mb-4">Get instant help from our support team</p>
-                  <p className="text-sm text-muted-foreground mb-4">Available: 9 AM - 6 PM, Mon-Fri</p>
+                  <p className="text-muted-foreground mb-4">
+                    Get instant help from our support team
+                  </p>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Available: 9 AM - 6 PM, Mon-Fri
+                  </p>
                   <Button className="w-full">Start Chat</Button>
                 </CardContent>
               </Card>
@@ -512,8 +599,12 @@ const TradesCRM = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground mb-4">Call us for urgent issues</p>
-                  <p className="text-sm text-muted-foreground mb-4">0800 123 4567</p>
+                  <p className="text-muted-foreground mb-4">
+                    Call us for urgent issues
+                  </p>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    0800 123 4567
+                  </p>
                   <Button variant="outline" className="w-full">
                     Call Now
                   </Button>
@@ -528,8 +619,12 @@ const TradesCRM = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground mb-4">Send us detailed questions</p>
-                  <p className="text-sm text-muted-foreground mb-4">support@tradepilot.co.uk</p>
+                  <p className="text-muted-foreground mb-4">
+                    Send us detailed questions
+                  </p>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    support@tradepilot.co.uk
+                  </p>
                   <Button variant="outline" className="w-full">
                     Send Email
                   </Button>
@@ -540,23 +635,35 @@ const TradesCRM = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Your Support Tickets</CardTitle>
+                  <CardTitle className="text-lg">
+                    Your Support Tickets
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center p-3 border rounded">
                       <div>
-                        <h4 className="font-medium">Profile verification help</h4>
-                        <p className="text-sm text-muted-foreground">Ticket #TP-001</p>
+                        <h4 className="font-medium">
+                          Profile verification help
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          Ticket #TP-001
+                        </p>
                       </div>
-                      <Badge className="bg-green-100 text-green-800">Resolved</Badge>
+                      <Badge className="bg-green-100 text-green-800">
+                        Resolved
+                      </Badge>
                     </div>
                     <div className="flex justify-between items-center p-3 border rounded">
                       <div>
                         <h4 className="font-medium">Payment method update</h4>
-                        <p className="text-sm text-muted-foreground">Ticket #TP-002</p>
+                        <p className="text-sm text-muted-foreground">
+                          Ticket #TP-002
+                        </p>
                       </div>
-                      <Badge className="bg-yellow-100 text-yellow-800">In Progress</Badge>
+                      <Badge className="bg-yellow-100 text-yellow-800">
+                        In Progress
+                      </Badge>
                     </div>
                   </div>
                 </CardContent>
@@ -587,7 +694,7 @@ const TradesCRM = () => {
           </div>
         )}
 
-        {activeTab === 'settings' && (
+        {activeTab === "settings" && (
           <div className="space-y-6">
             <h2 className="text-xl font-bold">Account Settings</h2>
 
@@ -601,20 +708,32 @@ const TradesCRM = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium">First Name *</label>
-                    <input className="w-full p-2 border border-border rounded-md bg-background" defaultValue="John" />
+                    <input
+                      className="w-full p-2 border border-border rounded-md bg-background"
+                      defaultValue="John"
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Last Name *</label>
-                    <input className="w-full p-2 border border-border rounded-md bg-background" defaultValue="Smith" />
+                    <input
+                      className="w-full p-2 border border-border rounded-md bg-background"
+                      defaultValue="Smith"
+                    />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Email Address *</label>
-                  <input className="w-full p-2 border border-border rounded-md bg-background" defaultValue="john.smith@email.com" />
+                  <input
+                    className="w-full p-2 border border-border rounded-md bg-background"
+                    defaultValue="john.smith@email.com"
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Phone Number *</label>
-                  <input className="w-full p-2 border border-border rounded-md bg-background" defaultValue="07123 456 789" />
+                  <input
+                    className="w-full p-2 border border-border rounded-md bg-background"
+                    defaultValue="07123 456 789"
+                  />
                 </div>
                 <Button>Save Personal Details</Button>
               </CardContent>
@@ -634,7 +753,9 @@ const TradesCRM = () => {
                   </Avatar>
                   <div>
                     <h3 className="font-semibold">John's Plumbing Services</h3>
-                    <p className="text-muted-foreground">Professional Plumber</p>
+                    <p className="text-muted-foreground">
+                      Professional Plumber
+                    </p>
                     <Button variant="outline" size="sm" className="mt-2">
                       Change Photo
                     </Button>
@@ -643,12 +764,17 @@ const TradesCRM = () => {
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Business Name *</label>
-                  <input className="w-full p-2 border border-border rounded-md bg-background" defaultValue="John's Plumbing Services" />
+                  <input
+                    className="w-full p-2 border border-border rounded-md bg-background"
+                    defaultValue="John's Plumbing Services"
+                  />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Primary Trade *</label>
+                    <label className="text-sm font-medium">
+                      Primary Trade *
+                    </label>
                     <select className="w-full p-2 border border-border rounded-md bg-background">
                       <option value="plumber">Plumber</option>
                       <option value="electrician">Electrician</option>
@@ -664,7 +790,9 @@ const TradesCRM = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Business Type *</label>
+                    <label className="text-sm font-medium">
+                      Business Type *
+                    </label>
                     <select className="w-full p-2 border border-border rounded-md bg-background">
                       <option value="sole-trader">Sole Trader</option>
                       <option value="limited-company">Limited Company</option>
@@ -674,7 +802,9 @@ const TradesCRM = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Years of Experience *</label>
+                  <label className="text-sm font-medium">
+                    Years of Experience *
+                  </label>
                   <select className="w-full p-2 border border-border rounded-md bg-background">
                     <option value="1-2">1-2 years</option>
                     <option value="3-5">3-5 years</option>
@@ -687,12 +817,19 @@ const TradesCRM = () => {
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Service Areas *</label>
-                  <input className="w-full p-2 border border-border rounded-md bg-background" defaultValue="M1, M2, M3, Manchester" />
-                  <p className="text-xs text-muted-foreground">Separate multiple areas with commas</p>
+                  <input
+                    className="w-full p-2 border border-border rounded-md bg-background"
+                    defaultValue="M1, M2, M3, Manchester"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Separate multiple areas with commas
+                  </p>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Business Description</label>
+                  <label className="text-sm font-medium">
+                    Business Description
+                  </label>
                   <textarea
                     className="w-full p-2 border border-border rounded-md bg-background h-24 resize-none"
                     placeholder="Describe your services, experience, and what makes you stand out..."
@@ -707,8 +844,12 @@ const TradesCRM = () => {
             {/* Verification & Credentials */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Verification & Credentials</CardTitle>
-                <CardDescription>Manage your insurance and certifications</CardDescription>
+                <CardTitle className="text-lg">
+                  Verification & Credentials
+                </CardTitle>
+                <CardDescription>
+                  Manage your insurance and certifications
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between p-3 border border-border rounded-lg">
@@ -717,11 +858,17 @@ const TradesCRM = () => {
                       <Settings className="h-4 w-4 text-green-600 dark:text-green-400" />
                     </div>
                     <div>
-                      <h4 className="font-medium">Public Liability Insurance</h4>
-                      <p className="text-sm text-muted-foreground">Valid until: March 2025</p>
+                      <h4 className="font-medium">
+                        Public Liability Insurance
+                      </h4>
+                      <p className="text-sm text-muted-foreground">
+                        Valid until: March 2025
+                      </p>
                     </div>
                   </div>
-                  <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Verified</Badge>
+                  <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                    Verified
+                  </Badge>
                 </div>
 
                 <div className="flex items-center justify-between p-3 border border-border rounded-lg">
@@ -731,10 +878,14 @@ const TradesCRM = () => {
                     </div>
                     <div>
                       <h4 className="font-medium">Gas Safe Registration</h4>
-                      <p className="text-sm text-muted-foreground">Registration: 123456</p>
+                      <p className="text-sm text-muted-foreground">
+                        Registration: 123456
+                      </p>
                     </div>
                   </div>
-                  <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Verified</Badge>
+                  <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                    Verified
+                  </Badge>
                 </div>
 
                 <div className="pt-4">
@@ -749,23 +900,31 @@ const TradesCRM = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Services & Pricing</CardTitle>
-                <CardDescription>Manage your service offerings and rates</CardDescription>
+                <CardDescription>
+                  Manage your service offerings and rates
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="p-3 border border-border rounded-lg">
                     <h4 className="font-medium">Emergency Plumbing</h4>
-                    <p className="text-sm text-muted-foreground">24/7 emergency repairs</p>
+                    <p className="text-sm text-muted-foreground">
+                      24/7 emergency repairs
+                    </p>
                     <p className="font-semibold text-primary">£85/hour</p>
                   </div>
                   <div className="p-3 border border-border rounded-lg">
                     <h4 className="font-medium">Bathroom Installation</h4>
-                    <p className="text-sm text-muted-foreground">Complete bathroom fitting</p>
+                    <p className="text-sm text-muted-foreground">
+                      Complete bathroom fitting
+                    </p>
                     <p className="font-semibold text-primary">From £2,500</p>
                   </div>
                   <div className="p-3 border border-border rounded-lg">
                     <h4 className="font-medium">Boiler Service</h4>
-                    <p className="text-sm text-muted-foreground">Annual service and maintenance</p>
+                    <p className="text-sm text-muted-foreground">
+                      Annual service and maintenance
+                    </p>
                     <p className="font-semibold text-primary">£120</p>
                   </div>
                   <Button variant="outline" className="w-full">
