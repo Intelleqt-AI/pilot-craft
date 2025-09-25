@@ -11,7 +11,7 @@ export const postJobs = async job => {
 
 // Add new lead
 export const postLeads = async lead => {
-  const { data, error } = await supabase.from('leads').insert(lead);
+  const { data, error } = await supabase.from('leads').insert([lead]);
   if (error) {
     throw new Error(error.message);
   }
@@ -33,4 +33,13 @@ export const fetchLeads = async () => {
     throw new Error(error.message);
   }
   return data;
+};
+
+// Update job status
+export const updateJobStatus = async ({ jobId, status }) => {
+  const { data, error } = await supabase.from('jobs').update({ status }).eq('id', jobId);
+  if (error) {
+    throw new Error(error.message);
+  }
+  return { data };
 };

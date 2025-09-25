@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
-import { User, AuthError } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
-import { UserRole, UserProfile } from "@/lib/supabase";
-import { useToast } from "@/hooks/use-toast";
+import { useState, useEffect } from 'react';
+import { User, AuthError } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
+import { UserRole, UserProfile } from '@/lib/supabase';
+import { useToast } from '@/hooks/use-toast';
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -42,11 +42,7 @@ export const useAuth = () => {
 
   const fetchProfile = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("user_id", userId)
-        .maybeSingle();
+      const { data, error } = await supabase.from('profiles').select('*').eq('user_id', userId).maybeSingle();
 
       if (error) throw error;
 
@@ -55,28 +51,24 @@ export const useAuth = () => {
         const { data: userResp } = await supabase.auth.getUser();
         const email = userResp.user?.email ?? null;
 
-        const { error: insertError } = await supabase.from("profiles").insert({
+        const { error: insertError } = await supabase.from('profiles').insert({
           user_id: userId,
           email,
-          first_name: "",
-          last_name: "",
-          role: "customer",
+          first_name: '',
+          last_name: '',
+          role: 'customer',
         });
 
         if (insertError) throw insertError;
 
-        const { data: created } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("user_id", userId)
-          .maybeSingle();
+        const { data: created } = await supabase.from('profiles').select('*').eq('user_id', userId).maybeSingle();
 
         setProfile(created as UserProfile);
       } else {
         setProfile(data as UserProfile);
       }
     } catch (error) {
-      console.error("Error fetching/creating profile:", error);
+      console.error('Error fetching/creating profile:', error);
     } finally {
       setLoading(false);
     }
@@ -112,17 +104,17 @@ export const useAuth = () => {
       if (error) throw error;
 
       toast({
-        title: "Account created successfully",
-        description: "Please check your email to verify your account.",
+        title: 'Account created successfully',
+        description: 'Please check your email to verify your account.',
       });
 
       return { data, error: null };
     } catch (error) {
       const authError = error as AuthError;
       toast({
-        title: "Sign up failed",
+        title: 'Sign up failed',
         description: authError.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
       return { data: null, error: authError };
     } finally {
@@ -142,17 +134,17 @@ export const useAuth = () => {
       if (error) throw error;
 
       toast({
-        title: "Signed in successfully",
-        description: "Welcome back!",
+        title: 'Signed in successfully',
+        description: 'Welcome back!',
       });
 
       return { data, error: null };
     } catch (error) {
       const authError = error as AuthError;
       toast({
-        title: "Sign in failed",
+        title: 'Sign in failed',
         description: authError.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
       return { data: null, error: authError };
     } finally {
@@ -167,15 +159,15 @@ export const useAuth = () => {
       if (error) throw error;
 
       toast({
-        title: "Signed out successfully",
-        description: "See you next time!",
+        title: 'Signed out successfully',
+        description: 'See you next time!',
       });
     } catch (error) {
       const authError = error as AuthError;
       toast({
-        title: "Sign out failed",
+        title: 'Sign out failed',
         description: authError.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -190,7 +182,7 @@ export const useAuth = () => {
     signIn,
     signOut,
     isAuthenticated: !!user,
-    isCustomer: profile?.role === "customer",
-    isTrade: profile?.role === "trade",
+    isCustomer: profile?.role === 'customer',
+    isTrade: profile?.role === 'trade',
   };
 };
