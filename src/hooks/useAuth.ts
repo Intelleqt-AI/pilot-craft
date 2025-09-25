@@ -9,24 +9,16 @@ export const useAuth = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
 
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      setUser(session?.user ?? null);
       if (session?.user) {
-        fetchProfile(session.user.id);
         fetchProfile(session.user.id);
       } else {
         setLoading(false);
-        setLoading(false);
       }
-    });
     });
 
     // Listen for auth changes
@@ -42,24 +34,9 @@ export const useAuth = () => {
       } else {
         setProfile(null);
         setLoading(false);
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        // Defer to avoid potential deadlocks; then fetch profile
-        setTimeout(() => {
-          fetchProfile(session.user!.id);
-        }, 0);
-      } else {
-        setProfile(null);
-        setLoading(false);
       }
     });
-    });
 
-    return () => subscription.unsubscribe();
-  }, []);
     return () => subscription.unsubscribe();
   }, []);
 
@@ -68,12 +45,9 @@ export const useAuth = () => {
       const { data, error } = await supabase.from('profiles').select('*').eq('user_id', userId).maybeSingle();
 
       if (error) throw error;
-      if (error) throw error;
 
       if (!data) {
         // Lazily create a profile if it doesn't exist
-        const { data: userResp } = await supabase.auth.getUser();
-        const email = userResp.user?.email ?? null;
         const { data: userResp } = await supabase.auth.getUser();
         const email = userResp.user?.email ?? null;
 
@@ -86,34 +60,20 @@ export const useAuth = () => {
         });
 
         if (insertError) throw insertError;
-        if (insertError) throw insertError;
 
         const { data: created } = await supabase.from('profiles').select('*').eq('user_id', userId).maybeSingle();
 
         setProfile(created as UserProfile);
-        setProfile(created as UserProfile);
       } else {
-        setProfile(data as UserProfile);
         setProfile(data as UserProfile);
       }
     } catch (error) {
       console.error('Error fetching/creating profile:', error);
     } finally {
       setLoading(false);
-      setLoading(false);
     }
-  };
   };
 
-  const signUp = async (
-    email: string,
-    password: string,
-    userData: {
-      firstName: string;
-      lastName: string;
-      role: UserRole;
-    }
-  ) => {
   const signUp = async (
     email: string,
     password: string,
@@ -124,10 +84,6 @@ export const useAuth = () => {
     }
   ) => {
     try {
-      setLoading(true);
-
-      const redirectUrl = `${window.location.origin}/`;
-
       setLoading(true);
 
       const redirectUrl = `${window.location.origin}/`;
@@ -144,11 +100,7 @@ export const useAuth = () => {
           },
         },
       });
-          },
-        },
-      });
 
-      if (error) throw error;
       if (error) throw error;
 
       toast({
@@ -157,9 +109,7 @@ export const useAuth = () => {
       });
 
       return { data, error: null };
-      return { data, error: null };
     } catch (error) {
-      const authError = error as AuthError;
       const authError = error as AuthError;
       toast({
         title: 'Sign up failed',
@@ -169,24 +119,18 @@ export const useAuth = () => {
       return { data: null, error: authError };
     } finally {
       setLoading(false);
-      setLoading(false);
     }
-  };
   };
 
   const signIn = async (email: string, password: string) => {
     try {
       setLoading(true);
 
-      setLoading(true);
-
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      });
 
-      if (error) throw error;
       if (error) throw error;
 
       toast({
@@ -195,9 +139,7 @@ export const useAuth = () => {
       });
 
       return { data, error: null };
-      return { data, error: null };
     } catch (error) {
-      const authError = error as AuthError;
       const authError = error as AuthError;
       toast({
         title: 'Sign in failed',
@@ -207,16 +149,11 @@ export const useAuth = () => {
       return { data: null, error: authError };
     } finally {
       setLoading(false);
-      setLoading(false);
     }
-  };
   };
 
   const signOut = async () => {
     try {
-      setLoading(true);
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
       setLoading(true);
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
@@ -227,14 +164,12 @@ export const useAuth = () => {
       });
     } catch (error) {
       const authError = error as AuthError;
-      const authError = error as AuthError;
       toast({
         title: 'Sign out failed',
         description: authError.message,
         variant: 'destructive',
       });
     } finally {
-      setLoading(false);
       setLoading(false);
     }
   };
@@ -248,6 +183,6 @@ export const useAuth = () => {
     signOut,
     isAuthenticated: !!user,
     isCustomer: profile?.role === 'customer',
-    isTrade: profile?.role === 'trade'
-  }
-}
+    isTrade: profile?.role === 'trade',
+  };
+};
