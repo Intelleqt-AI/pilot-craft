@@ -26,10 +26,24 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import TradeJobs from '@/components/Trade-CRM/TradeJobs';
 import TradeLeads from '@/components/Trade-CRM/TradeLeads';
+import { useQuery } from '@tanstack/react-query';
+import { fetchJobs, fetchLeads } from '@/lib/api';
 
 const TradesCRM = () => {
   const { isAuthenticated, loading, isTrade } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
+
+  const {
+    data: leadsData,
+    isLoading: leadsLoading,
+    error: leadsErros,
+    refetch: refetchLeads,
+  } = useQuery({
+    queryKey: ['fetchLeads'],
+    queryFn: fetchLeads,
+  });
+
+  const { data: jobsData, isLoading } = useQuery({ queryKey: ['Jobs'], queryFn: fetchJobs });
 
   if (loading) {
     return (
@@ -50,51 +64,40 @@ const TradesCRM = () => {
 
   // Mock data for the dashboard
   const stats = [
-    { title: 'Active Leads', value: '24', icon: Users, trend: '+12%' },
-    { title: 'Jobs This Month', value: '18', icon: Briefcase, trend: '+8%' },
-    { title: 'Revenue', value: '£8,450', icon: DollarSign, trend: '+15%' },
-    { title: 'Completion Rate', value: '94%', icon: TrendingUp, trend: '+2%' },
+    { title: 'Active Leads', value: `${leadsData?.length ?? 0}`, icon: Users, trend: '+12%' },
+    { title: 'Jobs This Month', value: `${jobsData?.length ?? 0}`, icon: Briefcase, trend: '+8%' },
+    { title: 'Revenue', value: 'Coming', icon: DollarSign, trend: '+15%' },
+    {
+      title: 'Completion Rate',
+      value: `${
+        jobsData && jobsData.length > 0
+          ? Math.round(((jobsData?.filter(job => job.status === 'complete').length ?? 0) / jobsData.length) * 100)
+          : 0
+      }%`,
+
+      icon: TrendingUp,
+      trend: '+2%',
+    },
   ];
 
   const upcomingAppointments = [
-    { time: '9:00 AM', client: 'Sarah Johnson', service: 'Bathroom Survey', location: 'Manchester' },
-    { time: '2:00 PM', client: 'Mike Thompson', service: 'Kitchen Consultation', location: 'Liverpool' },
-    { time: '4:30 PM', client: 'Emma Davis', service: 'Plumbing Repair', location: 'Birmingham' },
-  ];
-
-  const leads = [
     {
-      id: 1,
-      name: 'Sarah Johnson',
+      time: '9:00 AM',
+      client: 'Sarah Johnson',
+      service: 'Bathroom Survey',
       location: 'Manchester',
-      service: 'Bathroom Renovation',
-      value: '£3,200',
-      status: 'hot',
-      lastContact: '2 hours ago',
-      phone: '07123 456 789',
-      email: 'sarah.j@email.com',
     },
     {
-      id: 2,
-      name: 'Mike Thompson',
+      time: '2:00 PM',
+      client: 'Mike Thompson',
+      service: 'Kitchen Consultation',
       location: 'Liverpool',
-      service: 'Kitchen Installation',
-      value: '£5,500',
-      status: 'warm',
-      lastContact: '1 day ago',
-      phone: '07234 567 890',
-      email: 'mike.t@email.com',
     },
     {
-      id: 3,
-      name: 'Emma Davis',
-      location: 'Birmingham',
+      time: '4:30 PM',
+      client: 'Emma Davis',
       service: 'Plumbing Repair',
-      value: '£450',
-      status: 'cold',
-      lastContact: '3 days ago',
-      phone: '07345 678 901',
-      email: 'emma.d@email.com',
+      location: 'Birmingham',
     },
   ];
 
@@ -179,19 +182,21 @@ const TradesCRM = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {leads.slice(0, 3).map(lead => (
-                      <div key={lead.id} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div>
-                          <h4 className="font-medium">{lead.name}</h4>
-                          <p className="text-sm text-muted-foreground">{lead.service}</p>
-                          <p className="text-sm text-muted-foreground">{lead.location}</p>
+                    {leadsData &&
+                      leadsData.length !== 0 &&
+                      leadsData.slice(0, 3).map(lead => (
+                        <div key={lead.id} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div>
+                            <h4 className="font-medium">{lead.name}</h4>
+                            <p className="text-sm text-muted-foreground">{lead.service}</p>
+                            <p className="text-sm text-muted-foreground">{lead.location}</p>
+                          </div>
+                          <div className="text-right">
+                            <Badge className={getStatusColor(lead.badge)}>{lead.badge}</Badge>
+                            <p className="text-sm font-medium mt-1">£{lead?.value ? lead?.value : '0'}</p>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <Badge className={getStatusColor(lead.status)}>{lead.status}</Badge>
-                          <p className="text-sm font-medium mt-1">{lead.value}</p>
-                        </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 </CardContent>
               </Card>
