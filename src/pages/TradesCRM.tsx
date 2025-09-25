@@ -80,26 +80,7 @@ const TradesCRM = () => {
     },
   ];
 
-  const upcomingAppointments = [
-    {
-      time: '9:00 AM',
-      client: 'Sarah Johnson',
-      service: 'Bathroom Survey',
-      location: 'Manchester',
-    },
-    {
-      time: '2:00 PM',
-      client: 'Mike Thompson',
-      service: 'Kitchen Consultation',
-      location: 'Liverpool',
-    },
-    {
-      time: '4:30 PM',
-      client: 'Emma Davis',
-      service: 'Plumbing Repair',
-      location: 'Birmingham',
-    },
-  ];
+  const upcomingAppointments = [];
 
   const getStatusColor = (status: string) => {
     switch (status) {
