@@ -1,0 +1,28 @@
+User-agent: *
+Allow: /
+
+# Trade category pages
+Allow: /plumbers
+Allow: /electricians
+Allow: /builders
+Allow: /roofers
+Allow: /painters
+Allow: /kitchen-installers
+Allow: /gas-engineers
+Allow: /carpenters
+
+# Main pages
+Allow: /find-tradespeople
+Allow: /trades
+Allow: /support
+Allow: /blog
+
+# Exclude admin and API routes
+Disallow: /api/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /_next/
+Disallow: /verify-email
+
+# Sitemap
+Sitemap: https://mytradepilot.io/sitemap.xml

@@ -1,0 +1,153 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Trade Pilot Design System - Professional trades platform */
+
+@layer base {
+  :root {
+    /* Trade Pilot Color Palette */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 13%; /* Charcoal #222222 */
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 13%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 13%;
+
+    /* Orange for primary actions */
+    --primary: 24 100% 50%; /* Orange #FF6B00 */
+    --primary-foreground: 0 0% 100%;
+
+    /* Navy for secondary actions */
+    --secondary: 198 100% 13%; /* Navy #002B45 */
+    --secondary-foreground: 0 0% 100%;
+
+    /* Turquoise kept as accent */
+    --accent: 175 100% 38%; /* Turquoise #00C4B3 */
+    --accent-foreground: 0 0% 100%;
+
+    /* Light grey for section backgrounds */
+    --muted: 204 20% 97%; /* Light grey #F7F9FA */
+    --muted-foreground: 0 0% 45%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 24 100% 50%;
+
+    --radius: 0.5rem;
+
+    /* Trade Pilot Shadows */
+    --shadow-card: 0 2px 4px rgba(0,0,0,0.06);
+    --shadow-hover: 0 4px 12px rgba(0,0,0,0.1);
+
+    /* Transitions */
+    --transition-fast: 150ms ease-out;
+  }
+
+  /* Home+ Specific Styles - Completely Independent */
+  .homeplus-page {
+    font-family: 'Inter', sans-serif !important;
+  }
+  
+  .homeplus-page h1, 
+  .homeplus-page h2, 
+  .homeplus-page h3, 
+  .homeplus-page h4, 
+  .homeplus-page h5, 
+  .homeplus-page h6 {
+    color: #000000 !important;
+    font-weight: 700 !important;
+  }
+  
+  .homeplus-page .hero-title {
+    color: #000000 !important;
+  }
+  
+  .homeplus-page .hero-text {
+    color: #666666 !important;
+  }
+  
+  .homeplus-text-black { color: #000000 !important; }
+  .homeplus-text-white { color: #ffffff !important; }
+  .homeplus-text-yellow { color: #FFD533 !important; }
+  .homeplus-bg-black { background-color: #000000 !important; }
+  .homeplus-bg-white { background-color: #ffffff !important; }
+  .homeplus-bg-yellow { background-color: #FFD533 !important; }
+  .homeplus-border-black { border-color: #000000 !important; }
+  .homeplus-border-white { border-color: #ffffff !important; }
+  .homeplus-border-yellow { border-color: #FFD533 !important; }
+  .homeplus-font-inter { font-family: 'Inter', sans-serif !important; }
+  .homeplus-page .homeplus-heading-white { color: #ffffff !important; }
+
+  .dark {
+    --background: 0 0% 13%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 13%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 13%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 175 100% 38%;
+    --primary-foreground: 0 0% 13%;
+    --secondary: 198 100% 13%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 65%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-inter;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-secondary font-medium;
+  }
+}
+
+@layer components {
+  .trade-hero-overlay {
+    @apply relative bg-gradient-to-b from-black/20 via-transparent to-black/30;
+  }
+
+  .trade-card {
+    @apply bg-card rounded-2xl p-6 border-0;
+    box-shadow: var(--shadow-card);
+    transition: box-shadow var(--transition-fast);
+  }
+
+  .trade-card:hover {
+    box-shadow: var(--shadow-hover);
+  }
+
+  .fade-in-up {
+    @apply translate-y-4 opacity-0 transition-all duration-500;
+  }
+
+  .fade-in-up.in-view {
+    @apply translate-y-0 opacity-100;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
