@@ -130,7 +130,7 @@ export default function TradeJobs() {
   const [tradeValue, setTradeValue] = useState('');
   const [availability, setAvailability] = useState('');
   const [locationValue, setLocationValue] = useState('');
-  const [priceRange, setPriceRange] = useState([20, 200]);
+  const [priceRange, setPriceRange] = useState(0);
   const [tagsValue, setTagsValue] = useState('');
   const [tasks, setTasks] = useState<any[]>([]);
   const [priority, setPriority] = useState('Low');
@@ -223,7 +223,7 @@ export default function TradeJobs() {
     setTradeValue('');
     setAvailability('');
     setLocationValue('');
-    setPriceRange([20, 200]);
+    setPriceRange(0);
     setTagsValue('');
   };
 
@@ -247,8 +247,18 @@ export default function TradeJobs() {
                     <SelectValue placeholder="Select Trade" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Electrician">Electrician</SelectItem> <SelectItem value="Plumber">Plumber</SelectItem>
-                    <SelectItem value="Carpenter">Carpenter</SelectItem> <SelectItem value="Painter">Painter</SelectItem>
+                    <SelectItem value="Electrician">Electrician</SelectItem>
+                    <SelectItem value="Plumber">Plumber</SelectItem>
+                    <SelectItem value="Carpenter">Carpenter</SelectItem>
+                    <SelectItem value="Painter">Painter</SelectItem>
+                    <SelectItem value="Roofer">Roofer</SelectItem>
+                    <SelectItem value="Heating Engineer">Heating Engineer</SelectItem>
+                    <SelectItem value="Kitchen Fitter">Kitchen Fitter</SelectItem>
+                    <SelectItem value="Bathroom Fitter">Bathroom Fitter</SelectItem>
+                    <SelectItem value="Tiler">Tiler</SelectItem>
+                    <SelectItem value="Plasterer">Plasterer</SelectItem>
+                    <SelectItem value="Builder">Builder</SelectItem>
+                    <SelectItem value="Gardener">Gardener</SelectItem>
                   </SelectContent>
                 </Select>{' '}
               </div>{' '}
@@ -275,21 +285,16 @@ export default function TradeJobs() {
               </div>
               <div className="space-y-2">
                 {' '}
-                <Label className="text-sm">Price range per hour</Label>{' '}
+                <Label className="text-sm">Price per hour</Label>{' '}
                 <div className="px-1">
                   {' '}
-                  <Slider
+                  <Input
+                    type="number"
                     value={priceRange}
-                    onValueChange={(v: number[]) => setPriceRange(v)}
-                    min={0}
-                    max={1000}
-                    step={1}
+                    onChange={(e: number[]) => setPriceRange(e.target.value)}
                     className="w-full"
                   />{' '}
-                  <div className="flex items-center justify-between text-sm text-muted-foreground mt-2">
-                    {' '}
-                    <span>£{priceRange[0]}</span> <span className="font-medium">£{priceRange[1]}</span>{' '}
-                  </div>{' '}
+                  <div className="flex items-center justify-between text-sm text-muted-foreground mt-2"></div>{' '}
                 </div>{' '}
               </div>{' '}
               <div className="space-y-2">
