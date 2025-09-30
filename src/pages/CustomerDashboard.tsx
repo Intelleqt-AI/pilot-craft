@@ -187,12 +187,12 @@ const CustomerDashboard = () => {
                                 {lead.phone && (
                                   <span className="flex items-center gap-1">
                                     <Phone className="h-3 w-3" />
-                                    {lead.phone}
+                                    {lead?.bidder?.phone}
                                   </span>
                                 )}
                                 <span className="flex items-center gap-1">
                                   <Mail className="h-3 w-3" />
-                                  {lead.email}
+                                  {lead?.bidder?.email}
                                 </span>
                               </div>
                             </>
