@@ -84,14 +84,14 @@ const TradesCRM = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'hot':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
-      case 'warm':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300';
-      case 'cold':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+      case 'high':
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 capitalize';
+      case 'medium':
+        return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300 capitalize';
+      case 'low':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 capitalize';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300 capitalize';
     }
   };
 
@@ -173,7 +173,7 @@ const TradesCRM = () => {
                             <p className="text-sm text-muted-foreground">{lead.location}</p>
                           </div>
                           <div className="text-right">
-                            <Badge className={getStatusColor(lead.badge)}>{lead.badge}</Badge>
+                            <Badge className={getStatusColor(lead?.priority)}>{lead?.priority}</Badge>
                             <p className="text-sm font-medium mt-1">£{lead?.value ? lead?.value : '0'}</p>
                           </div>
                         </div>

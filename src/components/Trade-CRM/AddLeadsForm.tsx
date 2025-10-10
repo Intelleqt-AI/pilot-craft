@@ -20,7 +20,7 @@ interface Lead {
   email: string;
   lastContact?: string;
   title?: string;
-  badge: 'hot' | 'warm' | 'cold';
+  priority: 'low' | 'medium' | 'high';
 }
 
 type AddLeadsFormProps = {
@@ -33,7 +33,7 @@ const initialForm: Omit<Lead, 'id'> = {
   name: '',
   phone: '',
   email: '',
-  badge: 'warm',
+  priority: 'low',
   service: '',
   location: '',
   value: '',
@@ -80,17 +80,16 @@ const AddLeadsForm = ({ open, setOpen }: AddLeadsFormProps) => {
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSelectChange = (value: 'hot' | 'warm' | 'cold') => {
-    setForm(prev => ({ ...prev, badge: value }));
+  const handleSelectChange = (value: 'high' | 'medium' | 'low') => {
+    setForm(prev => ({ ...prev, priority: value }));
   };
 
   const handleAddLead = (e?: React.FormEvent) => {
     e?.preventDefault();
-    console.log(form);
     mutation.mutate(form);
   };
 
-  const isFormComplete = Boolean(form.name && form.service && form.location && form.value && form.email && form.badge);
+  const isFormComplete = Boolean(form.name && form.service && form.location && form.value && form.email);
 
   return (
     <Dialog open={open} onOpenChange={handleDialog}>
@@ -157,31 +156,31 @@ const AddLeadsForm = ({ open, setOpen }: AddLeadsFormProps) => {
               <Input name="email" value={form.email} onChange={handleChange} required disabled={isCustomer} />
             </div>
 
-            {/* Badge */}
+            {/* Priority */}
             <div className="flex flex-col gap-2">
-              <Label>Badge</Label>
-              <Select onValueChange={handleSelectChange} value={form.badge}>
+              <Label>Priority</Label>
+              <Select onValueChange={handleSelectChange} value={form.priority}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
+                  <SelectValue placeholder="Select Priority" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem
-                    value="hot"
+                    value="low"
                     className="hover:!bg-primary hover:!text-primary-foreground data-[state=checked]:!bg-primary data-[state=checked]:!text-primary-foreground"
                   >
-                    Hot
+                    Low
                   </SelectItem>
                   <SelectItem
-                    value="warm"
+                    value="medium"
                     className="hover:!bg-primary hover:!text-primary-foreground data-[state=checked]:!bg-primary data-[state=checked]:!text-primary-foreground"
                   >
-                    Warm
+                    Medium
                   </SelectItem>
                   <SelectItem
-                    value="cold"
+                    value="high"
                     className="hover:!bg-primary hover:!text-primary-foreground data-[state=checked]:!bg-primary data-[state=checked]:!text-primary-foreground"
                   >
-                    Cold
+                    High
                   </SelectItem>
                 </SelectContent>
               </Select>
