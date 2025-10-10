@@ -17,6 +17,16 @@ export const postLeads = async lead => {
   }
   return { data };
 };
+
+// Add new lead
+export const modifyLeads = async lead => {
+  const { data, error } = await supabase.from('leads').update(lead).eq('id', lead.id);
+  if (error) {
+    throw new Error(error.message);
+  }
+  return { data };
+};
+
 // Fetch jobs
 export const fetchJobs = async () => {
   const { data, error } = await supabase.from('jobs').select('*');
@@ -27,21 +37,41 @@ export const fetchJobs = async () => {
 };
 
 // Fetch leads
+// export const fetchLeads = async () => {
+//   const { data, error } = await supabase.from('leads').select('*');
+
+//   if (error) {
+//     throw new Error(error.message);
+//   }
+//   return data;
+// };
 export const fetchLeads = async () => {
   const { data, error } = await supabase.from('leads').select(`
       *,
-      bidder:bid_By ( id, email, first_name  , last_name)
+      bids(*, 
+      bidder:bid_by (
+         *
+        ))
     `);
+  if (error) {
+    throw new Error(error.message);
+  }
 
+  return data;
+};
+
+// add bids
+export const addBids = async ({ updates }) => {
+  const { data, error } = await supabase.from('bids').insert(updates);
   if (error) {
     throw new Error(error.message);
   }
   return data;
 };
-// update leads
-export const updateLead = async (id: number, updates: Record<string, any>) => {
-  const { data, error } = await supabase.from('leads').update(updates).eq('id', id).select().single();
 
+// modify bids
+export const modifyBids = async updates => {
+  const { data, error } = await supabase.from('bids').update(updates).eq('id', updates.id);
   if (error) {
     throw new Error(error.message);
   }
