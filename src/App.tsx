@@ -1,27 +1,28 @@
-import { Toaster } from '@/components/ui/toaster';
-import { Toaster as Sonner } from '@/components/ui/sonner';
-import { TooltipProvider } from '@/components/ui/tooltip';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Index from './pages/Index';
-import CustomerDashboard from './pages/CustomerDashboard';
-import FindTradespeople from './pages/FindTradespeople';
-import TradesCRM from './pages/TradesCRM';
-import ReviewsReputation from './pages/ReviewsReputation';
-import Support from './pages/Support';
-import TradeRegistration from './pages/TradeRegistration';
-import CustomerRegistration from './pages/CustomerRegistration';
-import Login from './pages/Login';
-import Profile from './pages/Profile';
-import VerifyEmail from './pages/VerifyEmail';
-import Trades from './pages/Trades';
-import Blog from './pages/Blog';
-import BlogPost from './pages/BlogPost';
-import NotFound from './pages/NotFound';
-import Plumbers from './pages/Plumbers';
-import Electricians from './pages/Electricians';
-import Builders from './pages/Builders';
-import Roofers from './pages/Roofers';
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Index from "./pages/Index";
+import CustomerDashboard from "./pages/CustomerDashboard";
+import FindTradespeople from "./pages/FindTradespeople";
+import TradesCRM from "./pages/TradesCRM";
+import ReviewsReputation from "./pages/ReviewsReputation";
+import Support from "./pages/Support";
+import TradeRegistration from "./pages/TradeRegistration";
+import CustomerRegistration from "./pages/CustomerRegistration";
+import Login from "./pages/Login";
+import Profile from "./pages/Profile";
+import VerifyEmail from "./pages/VerifyEmail";
+import Trades from "./pages/Trades";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
+import NotFound from "./pages/NotFound";
+import Plumbers from "./pages/Plumbers";
+import Electricians from "./pages/Electricians";
+import Builders from "./pages/Builders";
+import Roofers from "./pages/Roofers";
+import GoogleAnalytics from "./GoogleAnalytics";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <GoogleAnalytics />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
