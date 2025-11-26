@@ -25,4 +25,4 @@ Disallow: /_next/
 Disallow: /verify-email
 
 # Sitemap (exact URL, no trailing dot, no XML in this file)
-Sitemap: https://mytradepilot.io/sitemap.xml
+Sitemap: https://pilot-craft.vercel.app/sitemap.xml
