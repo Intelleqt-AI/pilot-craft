@@ -22,8 +22,6 @@ import Plumbers from "./pages/Plumbers";
 import Electricians from "./pages/Electricians";
 import Builders from "./pages/Builders";
 import Roofers from "./pages/Roofers";
-import GoogleAnalytics from "./GoogleAnalytics";
-
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -31,7 +29,6 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <GoogleAnalytics />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
