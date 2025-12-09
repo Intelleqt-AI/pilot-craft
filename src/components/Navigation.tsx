@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Menu, X, LogOut } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,11 +16,7 @@ const Navigation = () => {
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="hover:opacity-80 transition-opacity duration-150">
-              <img 
-                src="/lovable-uploads/7a0926c1-fceb-4602-bd62-9abc593c1b6a.png" 
-                alt="Trade Pilot logo" 
-                className="h-32 w-auto -my-8"
-              />
+              <img src="/lovable-uploads/7a0926c1-fceb-4602-bd62-9abc593c1b6a.png" alt="Trade Pilot logo" className="h-32 w-auto -my-8" />
             </Link>
           </div>
 
@@ -34,37 +30,25 @@ const Navigation = () => {
             <div className="flex items-center space-x-3">
               {user ? (
                 <>
-                  <span className="text-foreground text-sm">
-                    Hello, {profile?.first_name}
-                  </span>
-                  <Button 
-                    variant="ghost"
-                    onClick={() => navigate('/profile')}
-                  >
+                  <span className="text-foreground text-sm">Hello, {profile?.first_name}</span>
+                  <Button variant="ghost" onClick={() => navigate('/profile')}>
                     Profile
                   </Button>
-                  <Button 
-                    variant="ghost"
-                    onClick={signOut}
-                    disabled={loading}
-                  >
+                  <Button variant="ghost" onClick={signOut} disabled={loading}>
                     <LogOut className="h-4 w-4 mr-2" />
                     Sign Out
                   </Button>
                 </>
               ) : (
                 <>
-                  <Button 
-                    variant="ghost"
-                    onClick={() => navigate('/login?type=customer')}
-                  >
+                  <Button variant="ghost" onClick={() => navigate('/login?type=customer')}>
                     Sign In
                   </Button>
-                  <Button variant="default" asChild>
+                  {/* <Button variant="default" asChild>
                     <Link to="/join">Join free</Link>
-                  </Button>
+                  </Button> */}
                   <Button variant="outline" asChild>
-                    <Link to="/trades/join">Join as Trade</Link>
+                    <Link to="/trades/join">Join</Link>
                   </Button>
                 </>
               )}
@@ -73,11 +57,7 @@ const Navigation = () => {
 
           {/* Mobile menu button */}
           <div className="md:hidden">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsOpen(!isOpen)}
-            >
+            <Button variant="ghost" size="sm" onClick={() => setIsOpen(!isOpen)}>
               {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
@@ -97,11 +77,9 @@ const Navigation = () => {
               <div className="px-3 py-2 space-y-2">
                 {user ? (
                   <>
-                    <div className="text-foreground text-sm py-2">
-                      Hello, {profile?.first_name}
-                    </div>
-                    <Button 
-                      variant="ghost" 
+                    <div className="text-foreground text-sm py-2">Hello, {profile?.first_name}</div>
+                    <Button
+                      variant="ghost"
                       className="w-full justify-start"
                       onClick={() => {
                         navigate('/profile');
@@ -110,8 +88,8 @@ const Navigation = () => {
                     >
                       Profile
                     </Button>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       className="w-full justify-start"
                       onClick={() => {
                         signOut();
@@ -125,8 +103,8 @@ const Navigation = () => {
                   </>
                 ) : (
                   <>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       className="w-full justify-start"
                       onClick={() => {
                         navigate('/login?type=customer');
@@ -136,10 +114,14 @@ const Navigation = () => {
                       Sign In
                     </Button>
                     <Button variant="default" className="w-full" asChild>
-                      <Link to="/join" onClick={() => setIsOpen(false)}>Join free</Link>
+                      <Link to="/join" onClick={() => setIsOpen(false)}>
+                        Join free
+                      </Link>
                     </Button>
                     <Button variant="outline" className="w-full" asChild>
-                      <Link to="/trades/join" onClick={() => setIsOpen(false)}>Join as Trade</Link>
+                      <Link to="/trades/join" onClick={() => setIsOpen(false)}>
+                        Join as Trade
+                      </Link>
                     </Button>
                   </>
                 )}

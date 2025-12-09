@@ -1,28 +1,45 @@
-import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { 
-  Calendar, 
-  Clock, 
-  User, 
-  ArrowLeft, 
-  Share2, 
-  Bookmark, 
+import { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import {
+  Calendar,
+  Clock,
+  User,
+  ArrowLeft,
+  Share2,
+  Bookmark,
   ThumbsUp,
   MessageCircle,
   Eye,
   CheckCircle,
   AlertTriangle,
   Info,
-  Lightbulb
-} from "lucide-react";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
+  Lightbulb,
+} from 'lucide-react';
+import Navigation from '@/components/Navigation';
+import Footer from '@/components/Footer';
+import { fetchArticleBySlug } from '@/lib/api';
+import { useQuery } from '@tanstack/react-query';
+import BLockWrapper from '@/components/blocks/BLockWrapper';
 
 const BlogPost = () => {
   const { id } = useParams();
+
+  const {
+    data: article,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ['blogs', id],
+    queryFn: () => fetchArticleBySlug(id),
+    enabled: !!id,
+  });
+
+  console.log(article);
+
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -32,16 +49,18 @@ const BlogPost = () => {
 
   // Mock blog post data - in a real app, this would come from an API
   const blogPost = {
-    id: parseInt(id || "1"),
-    title: "The Complete Guide to Kitchen Renovation: From Planning to Completion",
-    excerpt: "Transform your kitchen with our comprehensive guide covering everything from initial planning to final touches. Learn from industry experts.",
-    author: "Sarah Mitchell",
-    authorBio: "Sarah is a certified interior designer with over 15 years of experience in home renovations. She specializes in kitchen and bathroom design.",
-    date: "January 15, 2025",
-    readTime: "12 min read",
-    category: "Home Renovation",
-    image: "/lovable-uploads/b63cd1f9-6e40-4716-bda0-9c34b9f6d061.png",
-    views: "2,847",
+    id: parseInt(id || '1'),
+    title: 'The Complete Guide to Kitchen Renovation: From Planning to Completion',
+    excerpt:
+      'Transform your kitchen with our comprehensive guide covering everything from initial planning to final touches. Learn from industry experts.',
+    author: 'Sarah Mitchell',
+    authorBio:
+      'Sarah is a certified interior designer with over 15 years of experience in home renovations. She specializes in kitchen and bathroom design.',
+    date: 'January 15, 2025',
+    readTime: '12 min read',
+    category: 'Home Renovation',
+    image: '/lovable-uploads/b63cd1f9-6e40-4716-bda0-9c34b9f6d061.png',
+    views: '2,847',
     content: `
       <p>Planning a kitchen renovation can feel overwhelming, but with the right approach, you can transform your space into the heart of your home. This comprehensive guide will walk you through every step of the process.</p>
 
@@ -171,59 +190,56 @@ const BlogPost = () => {
 
       <p>Remember, the key to a successful renovation is preparation, communication, and working with trusted professionals. Take your time in the planning phase – it will save you time, money, and stress during construction.</p>
     `,
-    tags: ["Kitchen Renovation", "Home Improvement", "Interior Design", "DIY", "Contractors"],
+    tags: ['Kitchen Renovation', 'Home Improvement', 'Interior Design', 'DIY', 'Contractors'],
     relatedPosts: [
       {
         id: 2,
-        title: "10 Signs You Need an Emergency Plumber",
-        image: "/lovable-uploads/31f52746-1420-439c-9f35-555016c7e6ba.png"
+        title: '10 Signs You Need an Emergency Plumber',
+        image: '/lovable-uploads/31f52746-1420-439c-9f35-555016c7e6ba.png',
       },
       {
         id: 3,
-        title: "Electrical Safety: What Every Homeowner Should Know",
-        image: "/lovable-uploads/a5c5ec1d-c610-4a2f-999d-0f3695ecbbde.png"
+        title: 'Electrical Safety: What Every Homeowner Should Know',
+        image: '/lovable-uploads/a5c5ec1d-c610-4a2f-999d-0f3695ecbbde.png',
       },
       {
         id: 6,
-        title: "Bathroom Renovation on a Budget: Smart Tips",
-        image: "/lovable-uploads/78c45c37-043b-4102-be34-98a64df6bb17.png"
-      }
-    ]
+        title: 'Bathroom Renovation on a Budget: Smart Tips',
+        image: '/lovable-uploads/78c45c37-043b-4102-be34-98a64df6bb17.png',
+      },
+    ],
   };
 
   useEffect(() => {
     // SEO: Update page title and meta description
-    document.title = `${blogPost.title} | Trade Pilot Blog`;
-    document.querySelector('meta[name="description"]')?.setAttribute(
-      "content", 
-      blogPost.excerpt
-    );
-  }, [blogPost.title, blogPost.excerpt]);
+    document.title = `${article?.title} | Trade Pilot Blog`;
+    document.querySelector('meta[name="description"]')?.setAttribute('content', article?.description);
+  }, [article?.title, article?.description]);
 
   return (
     <div className="min-h-screen bg-background">
       {/* SEO: Structured Data for Article */}
       <script type="application/ld+json">
         {JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Article",
-          "headline": blogPost.title,
-          "description": blogPost.excerpt,
-          "image": blogPost.image,
-          "author": {
-            "@type": "Person",
-            "name": blogPost.author
+          '@context': 'https://schema.org',
+          '@type': 'Article',
+          headline: article?.title,
+          description: article?.description,
+          image: article?.cover?.url,
+          author: {
+            '@type': 'Person',
+            name: article?.author?.name,
           },
-          "publisher": {
-            "@type": "Organization",
-            "name": "Trade Pilot",
-            "logo": {
-              "@type": "ImageObject",
-              "url": "https://tradepilot.com/logo.png"
-            }
+          publisher: {
+            '@type': 'Organization',
+            name: 'Trade Pilot',
+            logo: {
+              '@type': 'ImageObject',
+              url: 'https://tradepilot.com/logo.png',
+            },
           },
-          "datePublished": "2025-01-15",
-          "dateModified": "2025-01-15"
+          datePublished: '2025-01-15',
+          dateModified: '2025-01-15',
         })}
       </script>
 
@@ -241,15 +257,15 @@ const BlogPost = () => {
 
       {/* Article Header */}
       <article className="container mx-auto px-4 py-6">
-        <header className={`max-w-4xl mx-auto mb-8 transition-all duration-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+        <header
+          className={`max-w-4xl mx-auto mb-8 transition-all duration-700 ${
+            isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+          }`}
+        >
           <div className="mb-6">
-            <Badge className="mb-3">{blogPost.category}</Badge>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-secondary mb-4 leading-tight">
-              {blogPost.title}
-            </h1>
-            <p className="text-xl text-muted-foreground leading-relaxed">
-              {blogPost.excerpt}
-            </p>
+            <Badge className="mb-3">{article?.category?.name}</Badge>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-secondary mb-4 leading-tight">{article?.title}</h1>
+            <p className="text-xl text-muted-foreground leading-relaxed">{article?.description}</p>
           </div>
 
           {/* Article Meta */}
@@ -259,14 +275,21 @@ const BlogPost = () => {
                 <User className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <p className="font-semibold text-secondary">{blogPost.author}</p>
+                <p className="font-semibold text-secondary">Trade Pilot</p>
                 <p className="text-sm text-muted-foreground">Author</p>
               </div>
             </div>
             <Separator orientation="vertical" className="h-12" />
             <div className="flex items-center gap-2 text-muted-foreground">
               <Calendar className="h-4 w-4" />
-              <span>{blogPost.date}</span>
+              <span>
+                {' '}
+                {new Date(article?.publishedAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </span>
             </div>
             <div className="flex items-center gap-2 text-muted-foreground">
               <Clock className="h-4 w-4" />
@@ -278,8 +301,21 @@ const BlogPost = () => {
             </div>
           </div>
 
+          {/* Featured Image */}
+          <div
+            className={`max-w-5xl mx-auto mb-10 transition-all duration-700 delay-200 ${
+              isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+            }`}
+          >
+            <div className="relative overflow-hidden rounded-2xl shadow-2xl">
+              <img src={article?.cover?.url} alt={blogPost.title} className="w-full h-64 sm:h-96 object-cover" />
+            </div>
+          </div>
+
+          <BLockWrapper article={article} />
+
           {/* Article Actions */}
-          <div className="flex items-center gap-4">
+          <div className="flex mt-10 items-center gap-4">
             <Button variant="outline" size="sm" className="gap-2 rounded-xl">
               <Share2 className="h-4 w-4" />
               Share
@@ -288,118 +324,33 @@ const BlogPost = () => {
               <Bookmark className="h-4 w-4" />
               Save
             </Button>
-            <Button variant="outline" size="sm" className="gap-2 rounded-xl">
-              <ThumbsUp className="h-4 w-4" />
-              Like
-            </Button>
           </div>
         </header>
 
-        {/* Featured Image */}
-        <div className={`max-w-5xl mx-auto mb-10 transition-all duration-700 delay-200 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
-          <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-            <img 
-              src={blogPost.image} 
-              alt={blogPost.title}
-              className="w-full h-64 sm:h-96 object-cover"
-            />
-          </div>
-        </div>
-
-        {/* Article Content */}
-        <div className={`max-w-6xl mx-auto transition-all duration-700 delay-400 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
-            {/* Main Content */}
-            <div className="lg:col-span-4 px-4">
-              <div 
-                className="prose prose-xl max-w-none prose-headings:text-secondary prose-headings:font-bold prose-p:text-muted-foreground prose-p:leading-relaxed prose-li:text-muted-foreground prose-strong:text-secondary prose-p:mb-6 prose-headings:mb-8 prose-headings:mt-12 prose-ul:mb-8 prose-li:mb-2"
-                dangerouslySetInnerHTML={{ __html: blogPost.content }}
-              />
-
-              {/* Tags */}
-              <div className="mt-10 pt-6 border-t">
-                <h3 className="text-lg font-semibold text-secondary mb-3">Tags</h3>
-                <div className="flex flex-wrap gap-2">
-                  {blogPost.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="cursor-pointer hover:bg-primary hover:text-primary-foreground rounded-xl">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-
-              {/* Author Bio */}
-              <div className="mt-10 p-6 bg-muted/50 rounded-2xl">
-                <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                    <User className="h-8 w-8 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-secondary mb-2">About {blogPost.author}</h3>
-                    <p className="text-muted-foreground">{blogPost.authorBio}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Sidebar */}
-            <div className="lg:col-span-1">
-              <div className="sticky top-8 space-y-8">
-                {/* Table of Contents */}
-                <div className="bg-muted/50 rounded-2xl p-6">
-                  <h3 className="font-semibold text-secondary mb-4">Table of Contents</h3>
-                  <nav className="space-y-2 text-sm">
-                    <a href="#setting-budget" className="block text-muted-foreground hover:text-primary transition-colors">1. Setting Your Budget</a>
-                    <a href="#design-planning" className="block text-muted-foreground hover:text-primary transition-colors">2. Design and Layout Planning</a>
-                    <a href="#materials" className="block text-muted-foreground hover:text-primary transition-colors">3. Choosing Materials</a>
-                    <a href="#professionals" className="block text-muted-foreground hover:text-primary transition-colors">4. Finding Professionals</a>
-                    <a href="#timeline" className="block text-muted-foreground hover:text-primary transition-colors">5. Renovation Timeline</a>
-                    <a href="#managing" className="block text-muted-foreground hover:text-primary transition-colors">6. Managing the Process</a>
-                    <a href="#completion" className="block text-muted-foreground hover:text-primary transition-colors">7. Final Inspection</a>
-                  </nav>
-                </div>
-
-                {/* CTA */}
-                <div className="bg-primary rounded-2xl p-6 text-white">
-                  <h3 className="font-bold mb-3">Need Help With Your Project?</h3>
-                  <p className="text-white/90 text-sm mb-4">
-                    Find trusted, vetted professionals for your kitchen renovation.
-                  </p>
-                  <Button variant="secondary" size="sm" className="w-full" asChild>
-                    <Link to="/find-tradespeople">Find Tradespeople</Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Related Posts */}
-        <section className="max-w-5xl mx-auto mt-12">
+        {/* <section className="max-w-5xl mx-auto mt-12">
           <h2 className="text-2xl font-bold text-secondary mb-6">Related Articles</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {blogPost.relatedPosts.map((post) => (
-              <Link 
-                key={post.id} 
+            {blogPost.relatedPosts.map(post => (
+              <Link
+                key={post.id}
                 to={`/blog/${post.id}`}
                 className="group bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
               >
                 <div className="relative overflow-hidden">
-                  <img 
-                    src={post.image} 
+                  <img
+                    src={post.image}
                     alt={post.title}
                     className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
                 <div className="p-4">
-                  <h3 className="font-semibold text-secondary group-hover:text-primary transition-colors">
-                    {post.title}
-                  </h3>
+                  <h3 className="font-semibold text-secondary group-hover:text-primary transition-colors">{post.title}</h3>
                 </div>
               </Link>
             ))}
           </div>
-        </section>
+        </section> */}
 
         {/* Comments Section */}
         <section className="max-w-4xl mx-auto mt-12">
@@ -409,9 +360,7 @@ const BlogPost = () => {
               <h2 className="text-2xl font-bold text-secondary">Comments</h2>
             </div>
             <div className="bg-muted/50 rounded-2xl p-8 text-center">
-              <p className="text-muted-foreground mb-4">
-                We'd love to hear your thoughts on this article.
-              </p>
+              <p className="text-muted-foreground mb-4">We'd love to hear your thoughts on this article.</p>
               <Button className="rounded-xl">Leave a Comment</Button>
             </div>
           </div>
@@ -419,34 +368,6 @@ const BlogPost = () => {
       </article>
 
       <Footer />
-
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          .callout {
-            margin: 1.5rem 0;
-            padding: 1rem 1.5rem;
-            border-radius: 0.5rem;
-            border-left: 4px solid;
-          }
-          .callout-tip {
-            background: hsl(var(--primary) / 0.1);
-            border-color: hsl(var(--primary));
-            color: hsl(var(--primary-foreground));
-          }
-          .callout-warning {
-            background: hsl(var(--destructive) / 0.1);
-            border-color: hsl(var(--destructive));
-          }
-          .callout-info {
-            background: hsl(var(--secondary) / 0.1);
-            border-color: hsl(var(--secondary));
-          }
-          .callout-success {
-            background: hsl(var(--primary) / 0.1);
-            border-color: hsl(var(--primary));
-          }
-        `
-      }} />
     </div>
   );
 };
