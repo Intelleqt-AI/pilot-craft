@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -33,6 +33,7 @@ const TradeLeads = () => {
   const { profile } = useAuth();
   const queryClient = useQueryClient();
   const [schedule, setSchedule] = useState('today');
+  const [filteredLeads, setFilteredLeads] = useState<any[]>([]);
 
   const {
     data: leadsData,
@@ -43,6 +44,13 @@ const TradeLeads = () => {
     queryKey: ['fetchLeads'],
     queryFn: fetchLeads,
   });
+
+  useEffect(() => {
+    if (leadsLoading) return;
+    const userLeads = profile?.leads || [];
+    const filterByLocation = leadsData.filter(item => item.location == profile?.postcode);
+    setFilteredLeads(filterByLocation.filter(lead => userLeads.includes(lead.id)));
+  }, [leadsLoading, leadsData, profile]);
 
   const quoteMutation = useMutation({
     mutationFn: addBids,
@@ -74,8 +82,6 @@ const TradeLeads = () => {
     });
   };
 
-  console.log(leadsData);
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -85,9 +91,9 @@ const TradeLeads = () => {
       </div>
 
       <div className="grid gap-4">
-        {leadsData &&
-          leadsData.length !== 0 &&
-          leadsData.map(lead => {
+        {!leadsLoading &&
+          filteredLeads.length !== 0 &&
+          filteredLeads.map(lead => {
             const userBid = lead.bids?.find((bid: any) => bid.bid_by === profile?.id);
             return (
               <Card key={lead.id}>

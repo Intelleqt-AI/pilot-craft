@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,10 +28,12 @@ import TradeJobs from '@/components/Trade-CRM/TradeJobs';
 import TradeLeads from '@/components/Trade-CRM/TradeLeads';
 import { useQuery } from '@tanstack/react-query';
 import { fetchJobs, fetchLeads } from '@/lib/api';
+import LeadPurchase from '@/components/Trade-CRM/LeadPurchase';
 
 const TradesCRM = () => {
-  const { isAuthenticated, loading, isTrade } = useAuth();
+  const { isAuthenticated, loading, isTrade, profile } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [filteredLeads, setFilteredLeads] = useState<any[]>([]);
 
   const {
     data: leadsData,
@@ -42,6 +44,13 @@ const TradesCRM = () => {
     queryKey: ['fetchLeads'],
     queryFn: fetchLeads,
   });
+
+  useEffect(() => {
+    if (leadsLoading) return;
+    const userLeads = profile?.leads || [];
+    const filterByLocation = leadsData.filter(item => item.location == profile?.postcode);
+    setFilteredLeads(filterByLocation.filter(lead => userLeads.includes(lead.id)));
+  }, [leadsLoading, leadsData, profile]);
 
   const { data: jobsData, isLoading } = useQuery({ queryKey: ['Jobs'], queryFn: fetchJobs });
 
@@ -64,7 +73,7 @@ const TradesCRM = () => {
 
   // Mock data for the dashboard
   const stats = [
-    { title: 'Active Leads', value: `${leadsData?.length ?? 0}`, icon: Users, trend: '+12%' },
+    { title: 'Active Leads', value: `${filteredLeads?.length ?? 0}`, icon: Users, trend: '+12%' },
     { title: 'Jobs This Month', value: `${jobsData?.length ?? 0}`, icon: Briefcase, trend: '+8%' },
     { title: 'Revenue', value: 'Coming', icon: DollarSign, trend: '+15%' },
     {
@@ -122,7 +131,7 @@ const TradesCRM = () => {
 
         {/* Navigation Tabs */}
         <div className="flex gap-4 mb-6 border-b">
-          {['dashboard', 'leads', 'jobs', 'calendar', 'reviews', 'support', 'settings'].map(tab => (
+          {['dashboard', 'leads', 'leads to purchase', 'jobs', 'calendar', 'reviews', 'support', 'settings'].map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -163,9 +172,9 @@ const TradesCRM = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {leadsData &&
-                      leadsData.length !== 0 &&
-                      leadsData.slice(0, 3).map(lead => (
+                    {!leadsLoading &&
+                      filteredLeads.length !== 0 &&
+                      filteredLeads.slice(0, 3).map(lead => (
                         <div key={lead.id} className="flex items-center justify-between p-3 border rounded-lg">
                           <div>
                             <h4 className="font-medium">{lead.name}</h4>
@@ -212,6 +221,7 @@ const TradesCRM = () => {
         )}
 
         {activeTab === 'leads' && <TradeLeads />}
+        {activeTab === 'leads to purchase' && <LeadPurchase />}
 
         {activeTab === 'jobs' && <TradeJobs />}
 
