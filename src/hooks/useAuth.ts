@@ -94,9 +94,10 @@ export const useAuth = () => {
         options: {
           emailRedirectTo: redirectUrl,
           data: {
-            firstName: userData.firstName,
-            lastName: userData.lastName,
-            role: userData.role,
+            // firstName: userData.firstName,
+            // lastName: userData.lastName,
+            // role: userData.role,
+            ...userData,
           },
         },
       });

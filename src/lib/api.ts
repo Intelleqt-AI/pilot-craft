@@ -159,3 +159,28 @@ export async function fetchAuthors() {
     return { data: [] };
   }
 }
+
+export const addPurchase = async ({ lead, userID }) => {
+  const { data: profile, error: fetchError } = await supabase.from('profiles').select('leads').eq('id', userID).single();
+
+  if (fetchError) {
+    throw new Error(fetchError.message);
+  }
+
+  // Create or update the leads array
+  const currentLeads = profile.leads || [];
+  const updatedLeads = [...currentLeads, lead];
+
+  // Update the profiles table with the new leads array
+  const { data: profileData, error: profileError } = await supabase.from('profiles').update({ leads: updatedLeads }).eq('id', userID);
+
+  if (profileError) {
+    throw new Error(profileError.message);
+  }
+
+  return {
+    data: {
+      profile: profileData,
+    },
+  };
+};
