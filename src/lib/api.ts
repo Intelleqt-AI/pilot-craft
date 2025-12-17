@@ -78,6 +78,15 @@ export const modifyBids = async updates => {
   return data;
 };
 
+// Update profile
+export const updateProfile = async profile => {
+  const { data, error } = await supabase.from('profiles').update(profile).eq('id', profile.id);
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data;
+};
+
 // Update job status
 export const updateJobStatus = async ({ jobId, status }) => {
   const { data, error } = await supabase.from('jobs').update({ status }).eq('id', jobId);
@@ -161,18 +170,32 @@ export async function fetchAuthors() {
 }
 
 export const addPurchase = async ({ lead, userID }) => {
-  const { data: profile, error: fetchError } = await supabase.from('profiles').select('leads').eq('id', userID).single();
+  const { data: profile, error: fetchError } = await supabase.from('profiles').select('leads, credit').eq('id', userID).single();
 
   if (fetchError) {
     throw new Error(fetchError.message);
+  }
+
+  // Check if user has sufficient credit (30 credits required per lead)
+  const CREDIT_COST = 30;
+  const currentCredit = profile.credit || 0;
+  
+  if (currentCredit < CREDIT_COST) {
+    throw new Error('Insufficient credits. You need at least 30 credits to accept a lead.');
   }
 
   // Create or update the leads array
   const currentLeads = profile.leads || [];
   const updatedLeads = [...currentLeads, lead];
 
-  // Update the profiles table with the new leads array
-  const { data: profileData, error: profileError } = await supabase.from('profiles').update({ leads: updatedLeads }).eq('id', userID);
+  // Calculate new credit balance
+  const newCredit = currentCredit - CREDIT_COST;
+
+  // Update the profiles table with the new leads array and deducted credit
+  const { data: profileData, error: profileError } = await supabase
+    .from('profiles')
+    .update({ leads: updatedLeads, credit: newCredit })
+    .eq('id', userID);
 
   if (profileError) {
     throw new Error(profileError.message);

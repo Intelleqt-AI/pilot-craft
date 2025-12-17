@@ -19,7 +19,17 @@ export interface UserProfile {
   address_line_2?: string
   city?: string
   county?: string
-  postal_code?: string
+  postcode?: string
+  business_name?: string
+  business_type?: string
+  years_experience?: string
+  trade_specialty?: string
+  has_insurance?: boolean
+  has_license?: boolean
+  agreed_to_terms?: boolean
+  profile_description?: string
+  leads?: number[]
+  credit?: number
   created_at: string
   updated_at: string
 }
