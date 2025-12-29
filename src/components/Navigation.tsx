@@ -41,7 +41,7 @@ const Navigation = () => {
                 </>
               ) : (
                 <>
-                  <Button variant="ghost" onClick={() => navigate('/login?type=customer')}>
+                  <Button variant="ghost" onClick={() => navigate('/login')}>
                     Sign In
                   </Button>
                   {/* <Button variant="default" asChild>
@@ -107,7 +107,7 @@ const Navigation = () => {
                       variant="ghost"
                       className="w-full justify-start"
                       onClick={() => {
-                        navigate('/login?type=customer');
+                        navigate('/login');
                         setIsOpen(false);
                       }}
                     >

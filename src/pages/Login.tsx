@@ -2,8 +2,9 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, Eye, EyeOff } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ArrowLeft, Eye, EyeOff, Lock, Mail, User, Hammer } from "lucide-react"
 import { Link, useNavigate, useSearchParams } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 
@@ -13,7 +14,9 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [justLoggedIn, setJustLoggedIn] = useState(false)
   const [searchParams] = useSearchParams()
-  const userType = searchParams.get('type') || 'customer'
+  const initialType = searchParams.get('type') === 'trade' ? 'trade' : 'customer'
+  const [activeTab, setActiveTab] = useState(initialType)
+  
   const navigate = useNavigate()
   const { signIn, loading, profile, user } = useAuth()
 
@@ -41,85 +44,125 @@ const Login = () => {
     }
   }
 
+  const LoginForm = ({ type }: { type: string }) => (
+    <div className="space-y-4 pt-4">
+      <div className="space-y-2">
+        <Label htmlFor={`${type}-email`}>Email Address</Label>
+        <div className="relative">
+          <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            id={`${type}-email`}
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="name@example.com"
+            className="pl-9"
+            required
+          />
+        </div>
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor={`${type}-password`}>Password</Label>
+        <div className="relative">
+          <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            id={`${type}-password`}
+            type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter your password"
+            className="pl-9 pr-9"
+            required
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? (
+              <EyeOff className="h-4 w-4 text-muted-foreground" />
+            ) : (
+              <Eye className="h-4 w-4 text-muted-foreground" />
+            )}
+          </Button>
+        </div>
+      </div>
+
+      <Button type="submit" className="w-full bg-gradient-to-r from-primary to-orange-600 hover:from-primary/90 hover:to-orange-600/90 transition-all duration-300 transform hover:scale-[1.02]" disabled={loading}>
+        {loading ? 'Signing in...' : 'Sign In'}
+      </Button>
+
+      <div className="mt-6 text-center">
+        <p className="text-sm text-muted-foreground">
+          Don't have an account?{' '}
+          <Link 
+            to={type === 'trade' ? '/trades/join' : '/join'} 
+            className="text-primary font-medium hover:underline"
+          >
+            Sign up as a {type === 'trade' ? 'Trade' : 'Customer'}
+          </Link>
+        </p>
+      </div>
+    </div>
+  )
+
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen w-full flex items-center justify-center p-4 bg-gradient-to-br from-secondary/5 via-background to-primary/5">
+      <div className="w-full max-w-md animate-in fade-in zoom-in duration-500">
         <div className="mb-8">
-          <Link to="/" className="flex items-center space-x-2 text-secondary font-semibold mb-6">
+          <Link to="/" className="flex items-center space-x-2 text-muted-foreground hover:text-foreground transition-colors mb-6">
             <ArrowLeft className="h-4 w-4" />
             <span>Back to home</span>
           </Link>
         </div>
 
-        <Card>
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-semibold">
-              {userType === 'trade' ? 'Trade Login' : 'Customer Login'}
+        <Card className="border-0 shadow-2xl bg-card/80 backdrop-blur-sm ring-1 ring-black/5">
+          <CardHeader className="text-center pb-2">
+            <CardTitle className="text-3xl font-bold ">
+              Welcome Back
             </CardTitle>
-            <p className="text-muted-foreground">
-              {userType === 'trade' 
-                ? 'Access your trade dashboard' 
-                : 'Find trusted tradespeople'
-              }
-            </p>
+            <CardDescription className="text-base mt-2">
+              Sign in to manage your account
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-              </div>
+            <Tabs defaultValue={initialType} onValueChange={(val) => {
+              setActiveTab(val);
+            }} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6 p-1 bg-muted/50 rounded-lg">
+                <TabsTrigger value="customer" className="data-[state=active]:bg-white data-[state=active]:shadow-md rounded-md transition-all">
+                  <User className="w-4 h-4 mr-2" />
+                  Customer
+                </TabsTrigger>
+                <TabsTrigger value="trade" className="data-[state=active]:bg-white data-[state=active]:shadow-md rounded-md transition-all">
+                  <Hammer className="w-4 h-4 mr-2" />
+                  Trade
+                </TabsTrigger>
+              </TabsList>
 
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Signing in...' : 'Sign In'}
-              </Button>
-            </form>
+              <TabsContent value="customer" className="mt-0 focus-visible:ring-0">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="text-center mb-6">
+                    <h3 className="text-lg font-medium text-secondary">Customer Login</h3>
+                    <p className="text-sm text-muted-foreground">Find and book trusted tradespeople</p>
+                  </div>
+                  <LoginForm type="customer" />
+                </form>
+              </TabsContent>
 
-            <div className="mt-6 text-center">
-              <p className="text-sm text-muted-foreground">
-                Don't have an account?{' '}
-                <Link 
-                  to={userType === 'trade' ? '/trades/join' : '/join'} 
-                  className="text-primary hover:underline"
-                >
-                  Sign up here
-                </Link>
-              </p>
-            </div>
+              <TabsContent value="trade" className="mt-0 focus-visible:ring-0">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="text-center mb-6">
+                    <h3 className="text-lg font-medium text-secondary">Trade Professional</h3>
+                    <p className="text-sm text-muted-foreground">Manage your business and leads</p>
+                  </div>
+                  <LoginForm type="trade" />
+                </form>
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
       </div>

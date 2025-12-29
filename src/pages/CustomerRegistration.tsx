@@ -342,7 +342,7 @@ const CustomerRegistration = () => {
               <p className="text-sm text-muted-foreground">
                 Already have an account?{' '}
                 <Link 
-                  to="/login?type=customer" 
+                  to="/login" 
                   className="text-primary hover:underline"
                 >
                   Sign in here
