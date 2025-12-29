@@ -55,7 +55,7 @@ const Index = () => {
       
       {/* Hero Section */}
       <section 
-        className="relative h-screen flex items-start justify-center pt-72 bg-cover bg-center"
+        className="relative min-h-screen flex items-start justify-center pt-[80px] md:pt-[200px] bg-cover bg-center"
         style={{ backgroundImage: `url(${heroImage})` }}
       >
         {/* Dark blue overlay */}
