@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Mail, Map, MapPin, Phone } from 'lucide-react';
+import { Mail, Map, MapPin, Phone, Coins } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { addBids, addPurchase, fetchLeads } from '@/lib/api';
 import AddLeadsForm from './AddLeadsForm';
@@ -11,6 +11,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+const CREDIT_COST = 30;
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -43,11 +45,12 @@ const LeadPurchase = () => {
   const mutation = useMutation({
     mutationFn: addPurchase,
     onSuccess: () => {
-      //   queryClient.refetchQueries(['fetchLeads']);
-      toast('Lead purchased successfully!');
+      toast.success('Lead accepted successfully! 30 credits deducted.');
+      refetch();
+      window.location.reload();
     },
-    onError: () => {
-      toast('Error! Try again');
+    onError: (error: any) => {
+      toast.error(error.message || 'Error! Try again');
     },
   });
 
@@ -60,19 +63,46 @@ const LeadPurchase = () => {
     mutation.mutate({ lead: id, userID: profile?.id });
   };
 
+  const hasInsufficientCredit = (profile?.credit || 0) < CREDIT_COST;
+  const hasAlreadyAccepted = (leadId: number) => profile?.leads?.includes(leadId);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold">Leads to purchase</h2>
-        {/* <Button onClick={() => setOpen(true)}>Add New Lead</Button> */}
-        {/* <AddLeadsForm open={open} setOpen={setOpen} /> */}
+        <div className="flex items-center gap-4">
+          <Badge variant="outline" className="text-sm px-3 py-1">
+            <Coins className="h-4 w-4 mr-2" />
+            Credit Cost: {CREDIT_COST} per lead
+          </Badge>
+          <Badge 
+            variant={hasInsufficientCredit ? "destructive" : "secondary"} 
+            className="text-sm px-3 py-1"
+          >
+            <Coins className="h-4 w-4 mr-2" />
+            Your Credit: {profile?.credit || 0}
+          </Badge>
+        </div>
       </div>
+
+      {hasInsufficientCredit && (
+        <Card className="border-destructive bg-destructive/10">
+          <CardContent className="p-4">
+            <p className="text-sm text-destructive font-medium">
+              ⚠️ Insufficient credits! You need at least {CREDIT_COST} credits to accept a lead. Please top up your account.
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid gap-4">
         {!leadsLoading &&
           filteredLeads.length !== 0 &&
           filteredLeads.map(lead => {
             const userBid = lead.bids?.find((bid: any) => bid.bid_by === profile?.id);
+            const alreadyAccepted = hasAlreadyAccepted(lead.id);
+            const cannotAccept = hasInsufficientCredit || alreadyAccepted;
+
             return (
               <Card key={lead.id}>
                 <CardContent className="p-6">
@@ -84,9 +114,17 @@ const LeadPurchase = () => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="flex gap-2">
-                        <Button disabled={profile?.leads?.includes(lead.id)} size="sm" onClick={() => handlePurchase(lead.id)}>
-                          {profile?.leads?.includes(lead.id) ? 'Accepted' : 'Accept'}
+                      <div className="flex flex-col gap-2 items-end">
+                        <Badge variant="outline" className="text-xs">
+                          <Coins className="h-3 w-3 mr-1" />
+                          {CREDIT_COST} credits
+                        </Badge>
+                        <Button 
+                          disabled={cannotAccept || mutation.isPending} 
+                          size="sm" 
+                          onClick={() => handlePurchase(lead.id)}
+                        >
+                          { alreadyAccepted ? 'Purchased' : hasInsufficientCredit ? 'Insufficient Credits' : 'Purchase'}
                         </Button>
                       </div>
                     </div>

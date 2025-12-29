@@ -28,7 +28,9 @@ const getStatusColor = (status: string) => {
 const TradeLeads = () => {
   const [open, setOpen] = useState(false);
   const [openQuote, setOpenQuote] = useState(false);
+  const [openViewLead, setOpenViewLead] = useState(false);
   const [selectedLead, setSelectedLead] = useState<any>(null);
+  const [viewedLead, setViewedLead] = useState<any>(null);
   const [proposedValue, setProposedValue] = useState('');
   const { profile } = useAuth();
   const queryClient = useQueryClient();
@@ -44,6 +46,8 @@ const TradeLeads = () => {
     queryKey: ['fetchLeads'],
     queryFn: fetchLeads,
   });
+  
+  console.log(leadsData);
 
   useEffect(() => {
     if (leadsLoading) return;
@@ -69,6 +73,11 @@ const TradeLeads = () => {
   const handleQuoteOpen = (lead: any) => {
     setSelectedLead(lead);
     setOpenQuote(true);
+  };
+
+  const handleViewLead = (lead: any) => {
+    setViewedLead(lead);
+    setOpenViewLead(true);
   };
 
   const handleQuoteSubmit = (e: React.FormEvent) => {
@@ -122,8 +131,8 @@ const TradeLeads = () => {
                     <div className="text-right">
                       <p className="text-xl font-bold text-primary mb-2">£{lead?.value ? lead?.value : '0'}</p>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
-                          Contact
+                        <Button variant="outline" size="sm" onClick={() => handleViewLead(lead)}>
+                          View Lead
                         </Button>
                         <Button disabled={userBid} size="sm" onClick={() => handleQuoteOpen(lead)}>
                           {userBid ? 'Quoted' : 'Quote'}
@@ -234,6 +243,112 @@ const TradeLeads = () => {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Lead Dialog */}
+      <Dialog open={openViewLead} onOpenChange={setOpenViewLead}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Lead Details</DialogTitle>
+            <DialogDescription>
+              Complete information about this lead
+            </DialogDescription>
+          </DialogHeader>
+          
+          {viewedLead && (
+            <div className="space-y-6">
+              {/* Basic Information */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg border-b pb-2">Basic Information</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Service Type</label>
+                    <p className="text-base capitalize">{viewedLead.service || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Category</label>
+                    <p className="text-base capitalize">{viewedLead.category || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Priority</label>
+                    <Badge className={getStatusColor(viewedLead.priority)}>{viewedLead.priority || 'N/A'}</Badge>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Location</label>
+                    <p className="text-base">{viewedLead.location || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Estimated Value</label>
+                    <p className="text-base font-semibold text-primary">£{viewedLead.value || '0'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Duration</label>
+                    <p className="text-base">{viewedLead.duration || 'N/A'}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact Information */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg border-b pb-2">Contact Information</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Name</label>
+                    <p className="text-base">{viewedLead.name || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Email</label>
+                    <p className="text-base">{viewedLead.email || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Phone</label>
+                    <p className="text-base">{viewedLead.phone || 'N/A'}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Detailed Answers */}
+              {viewedLead.answers && Object.keys(viewedLead.answers).length > 0 && (
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg border-b pb-2">Additional Details</h3>
+                  <div className="space-y-3">
+                    {Object.entries(viewedLead.answers).map(([key, value]: [string, any]) => (
+                      <div key={key} className="flex flex-col space-y-1">
+                        <label className="text-sm font-medium text-muted-foreground capitalize">
+                          {key.replace(/_/g, ' ')}
+                        </label>
+                        <p className="text-base bg-muted/30 px-3 py-2 rounded-md">
+                          {typeof value === 'object' ? JSON.stringify(value) : value || 'N/A'}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Timestamps */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg border-b pb-2">Timeline</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Created At</label>
+                    <p className="text-base">{viewedLead.created_at ? new Date(viewedLead.created_at).toLocaleString() : 'N/A'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Updated At</label>
+                    <p className="text-base">{viewedLead.updated_at ? new Date(viewedLead.updated_at).toLocaleString() : 'N/A'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpenViewLead(false)}>
+              Close
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

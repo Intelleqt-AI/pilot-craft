@@ -26,14 +26,36 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import TradeJobs from '@/components/Trade-CRM/TradeJobs';
 import TradeLeads from '@/components/Trade-CRM/TradeLeads';
-import { useQuery } from '@tanstack/react-query';
-import { fetchJobs, fetchLeads } from '@/lib/api';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { fetchJobs, fetchLeads, updateProfile } from '@/lib/api';
 import LeadPurchase from '@/components/Trade-CRM/LeadPurchase';
+import { useToast } from '@/hooks/use-toast';
 
 const TradesCRM = () => {
   const { isAuthenticated, loading, isTrade, profile } = useAuth();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [filteredLeads, setFilteredLeads] = useState<any[]>([]);
+
+  // Personal Information State
+  const [firstName, setFirstName] = useState(profile?.first_name || '');
+  const [lastName, setLastName] = useState(profile?.last_name || '');
+  const [email, setEmail] = useState(profile?.email || '');
+  const [phone, setPhone] = useState(profile?.phone || '');
+
+  // Business Information State
+  const [businessName, setBusinessName] = useState(profile?.business_name || '');
+  const [tradeSpecialty, setTradeSpecialty] = useState(profile?.trade_specialty || '');
+  const [businessType, setBusinessType] = useState(profile?.business_type || '');
+  const [yearsExperience, setYearsExperience] = useState(profile?.years_experience || '');
+  const [postcode, setPostcode] = useState(profile?.postcode || '');
+  const [profileDescription, setProfileDescription] = useState(profile?.profile_description || '');
+  const [addressLine1, setAddressLine1] = useState(profile?.address_line_1 || '');
+  const [addressLine2, setAddressLine2] = useState(profile?.address_line_2 || '');
+  const [city, setCity] = useState(profile?.city || '');
+  const [county, setCounty] = useState(profile?.county || '');
+  const [hasInsurance, setHasInsurance] = useState(profile?.has_insurance || false);
+  const [hasLicense, setHasLicense] = useState(profile?.has_license || false);
 
   const {
     data: leadsData,
@@ -44,15 +66,85 @@ const TradesCRM = () => {
     queryKey: ['fetchLeads'],
     queryFn: fetchLeads,
   });
+  
+  console.log('profile',profile)
+
+  // Update state when profile changes
+  useEffect(() => {
+    if (profile) {
+      setFirstName(profile.first_name || '');
+      setLastName(profile.last_name || '');
+      setEmail(profile.email || '');
+      setPhone(profile.phone || '');
+      setBusinessName(profile.business_name || '');
+      setTradeSpecialty(profile.trade_specialty || '');
+      setBusinessType(profile.business_type || '');
+      setYearsExperience(profile.years_experience || '');
+      setPostcode(profile.postcode || '');
+      setProfileDescription(profile.profile_description || '');
+      setAddressLine1(profile.address_line_1 || '');
+      setAddressLine2(profile.address_line_2 || '');
+      setCity(profile.city || '');
+      setCounty(profile.county || '');
+      setHasInsurance(profile.has_insurance || false);
+      setHasLicense(profile.has_license || false);
+    }
+  }, [profile]);
 
   useEffect(() => {
     if (leadsLoading) return;
     const userLeads = profile?.leads || [];
     const filterByLocation = leadsData.filter(item => item.location == profile?.postcode);
-    setFilteredLeads(filterByLocation.filter(lead => userLeads.includes(lead.id)));
+    setFilteredLeads(filterByLocation.filter(lead => userLeads.includes(Number(lead.id))));
   }, [leadsLoading, leadsData, profile]);
 
   const { data: jobsData, isLoading } = useQuery({ queryKey: ['Jobs'], queryFn: fetchJobs });
+
+  // Profile update mutations
+  const updateProfileMutation = useMutation({
+    mutationFn: updateProfile,
+    onSuccess: () => {
+      toast({
+        title: 'Success',
+        description: 'Profile updated successfully',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to update profile',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const handleSavePersonalInfo = () => {
+    updateProfileMutation.mutate({
+      id: profile?.id,
+      first_name: firstName,
+      last_name: lastName,
+      email: email,
+      phone: phone,
+    });
+  };
+
+  const handleSaveBusinessInfo = () => {
+    updateProfileMutation.mutate({
+      id: profile?.id,
+      business_name: businessName,
+      trade_specialty: tradeSpecialty,
+      business_type: businessType,
+      years_experience: yearsExperience,
+      postcode: postcode,
+      profile_description: profileDescription,
+      address_line_1: addressLine1,
+      address_line_2: addressLine2,
+      city: city,
+      county: county,
+      has_insurance: hasInsurance,
+      has_license: hasLicense,
+    });
+  };
 
   if (loading) {
     return (
@@ -585,7 +677,10 @@ const TradesCRM = () => {
 
         {activeTab === 'settings' && (
           <div className="space-y-6">
+           <div className='flex items-center justify-between'>
             <h2 className="text-xl font-bold">Account Settings</h2>
+            <p>Remaining Credit: {profile?.credit}</p>
+           </div>
 
             {/* Personal Information */}
             <Card>
@@ -597,22 +692,40 @@ const TradesCRM = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium">First Name *</label>
-                    <input className="w-full p-2 border border-border rounded-md bg-background" defaultValue="John" />
+                    <input 
+                      className="w-full p-2 border border-border rounded-md bg-background" 
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Last Name *</label>
-                    <input className="w-full p-2 border border-border rounded-md bg-background" defaultValue="Smith" />
+                    <input 
+                      className="w-full p-2 border border-border rounded-md bg-background" 
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                    />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Email Address *</label>
-                  <input className="w-full p-2 border border-border rounded-md bg-background" defaultValue="john.smith@email.com" />
+                  <input readOnly disabled 
+                    className="w-full p-2 border border-border rounded-md bg-background" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Phone Number *</label>
-                  <input className="w-full p-2 border border-border rounded-md bg-background" defaultValue="07123 456 789" />
+                  <input 
+                    className="w-full p-2 border border-border rounded-md bg-background" 
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
                 </div>
-                <Button>Save Personal Details</Button>
+                <Button onClick={handleSavePersonalInfo} disabled={updateProfileMutation.isPending}>
+                  {updateProfileMutation.isPending ? 'Saving...' : 'Save Personal Details'}
+                </Button>
               </CardContent>
             </Card>
 
@@ -626,11 +739,11 @@ const TradesCRM = () => {
                 <div className="flex items-center gap-4 mb-4">
                   <Avatar className="h-16 w-16">
                     <AvatarImage src="" />
-                    <AvatarFallback>JS</AvatarFallback>
+                    <AvatarFallback>{firstName?.[0]}{lastName?.[0]}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <h3 className="font-semibold">John's Plumbing Services</h3>
-                    <p className="text-muted-foreground">Professional Plumber</p>
+                    <h3 className="font-semibold">{businessName || 'Your Business'}</h3>
+                    <p className="text-muted-foreground">{tradeSpecialty || 'Trade Professional'}</p>
                     <Button variant="outline" size="sm" className="mt-2">
                       Change Photo
                     </Button>
@@ -639,29 +752,43 @@ const TradesCRM = () => {
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Business Name *</label>
-                  <input className="w-full p-2 border border-border rounded-md bg-background" defaultValue="John's Plumbing Services" />
+                  <input 
+                    className="w-full p-2 border border-border rounded-md bg-background" 
+                    value={businessName}
+                    onChange={(e) => setBusinessName(e.target.value)}
+                  />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Primary Trade *</label>
-                    <select className="w-full p-2 border border-border rounded-md bg-background">
-                      <option value="plumber">Plumber</option>
-                      <option value="electrician">Electrician</option>
-                      <option value="builder">Builder</option>
-                      <option value="roofer">Roofer</option>
-                      <option value="painter">Painter/Decorator</option>
-                      <option value="kitchen">Kitchen Installer</option>
-                      <option value="gas">Gas Engineer</option>
-                      <option value="carpenter">Carpenter/Joiner</option>
-                      <option value="tiler">Tiler</option>
-                      <option value="plasterer">Plasterer</option>
+                    <select 
+                      className="w-full p-2 border border-border rounded-md bg-background"
+                      value={tradeSpecialty}
+                      onChange={(e) => setTradeSpecialty(e.target.value)}
+                    >
+                      <option value="">Select Trade</option>
+                      <option value="Plumber">Plumber</option>
+                      <option value="Electrician">Electrician</option>
+                      <option value="Builder">Builder</option>
+                      <option value="Roofer">Roofer</option>
+                      <option value="Painter">Painter/Decorator</option>
+                      <option value="Kitchen Installer">Kitchen Installer</option>
+                      <option value="Gas Engineer">Gas Engineer</option>
+                      <option value="Carpenter">Carpenter/Joiner</option>
+                      <option value="Tiler">Tiler</option>
+                      <option value="Plasterer">Plasterer</option>
                     </select>
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Business Type *</label>
-                    <select className="w-full p-2 border border-border rounded-md bg-background">
+                    <select 
+                      className="w-full p-2 border border-border rounded-md bg-background"
+                      value={businessType}
+                      onChange={(e) => setBusinessType(e.target.value)}
+                    >
+                      <option value="">Select Type</option>
                       <option value="sole-trader">Sole Trader</option>
                       <option value="limited-company">Limited Company</option>
                       <option value="partnership">Partnership</option>
@@ -671,20 +798,28 @@ const TradesCRM = () => {
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Years of Experience *</label>
-                  <select className="w-full p-2 border border-border rounded-md bg-background">
+                  <select 
+                    className="w-full p-2 border border-border rounded-md bg-background"
+                    value={yearsExperience}
+                    onChange={(e) => setYearsExperience(e.target.value)}
+                  >
+                    <option value="">Select Experience</option>
                     <option value="1-2">1-2 years</option>
                     <option value="3-5">3-5 years</option>
-                    <option value="6-10" selected>
-                      6-10 years
-                    </option>
+                    <option value="6-10">6-10 years</option>
                     <option value="10+">10+ years</option>
                   </select>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Service Areas *</label>
-                  <input className="w-full p-2 border border-border rounded-md bg-background" defaultValue="M1, M2, M3, Manchester" />
-                  <p className="text-xs text-muted-foreground">Separate multiple areas with commas</p>
+                  <label className="text-sm font-medium">Postcode *</label>
+                  <input disabled readOnly 
+                    className="w-full p-2 border border-border rounded-md bg-background" 
+                    value={postcode}
+                    onChange={(e) => setPostcode(e.target.value)}
+                    placeholder="Enter your postcode"
+                  />
+                  <p className="text-xs text-muted-foreground">This will be used to show you relevant leads in your area</p>
                 </div>
 
                 <div className="space-y-2">
@@ -692,11 +827,14 @@ const TradesCRM = () => {
                   <textarea
                     className="w-full p-2 border border-border rounded-md bg-background h-24 resize-none"
                     placeholder="Describe your services, experience, and what makes you stand out..."
-                    defaultValue="Professional plumbing services with over 8 years of experience. Specializing in emergency repairs, bathroom installations, and boiler maintenance. Fully insured and Gas Safe registered."
+                    value={profileDescription}
+                    onChange={(e) => setProfileDescription(e.target.value)}
                   />
                 </div>
 
-                <Button>Save Business Details</Button>
+                <Button onClick={handleSaveBusinessInfo} disabled={updateProfileMutation.isPending}>
+                  {updateProfileMutation.isPending ? 'Saving...' : 'Save Business Details'}
+                </Button>
               </CardContent>
             </Card>
 
