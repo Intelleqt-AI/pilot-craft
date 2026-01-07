@@ -8,6 +8,89 @@ import { ArrowLeft, Eye, EyeOff, Lock, Mail, User, Hammer } from "lucide-react"
 import { Link, useNavigate, useSearchParams } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 
+const LoginForm = ({ 
+  type, 
+  email, 
+  setEmail, 
+  password, 
+  setPassword, 
+  showPassword, 
+  setShowPassword, 
+  loading 
+}: { 
+  type: string
+  email: string
+  setEmail: (val: string) => void
+  password: string
+  setPassword: (val: string) => void
+  showPassword: boolean
+  setShowPassword: (val: boolean) => void
+  loading: boolean
+}) => (
+  <div className="space-y-4 pt-4">
+    <div className="space-y-2">
+      <Label htmlFor={`${type}-email`}>Email Address</Label>
+      <div className="relative">
+        <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input
+          id={`${type}-email`}
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="name@example.com"
+          className="pl-9"
+          required
+        />
+      </div>
+    </div>
+    
+    <div className="space-y-2">
+      <Label htmlFor={`${type}-password`}>Password</Label>
+      <div className="relative">
+        <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input
+          id={`${type}-password`}
+          type={showPassword ? "text" : "password"}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Enter your password"
+          className="pl-9 pr-9"
+          required
+        />
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+          onClick={() => setShowPassword(!showPassword)}
+        >
+          {showPassword ? (
+            <EyeOff className="h-4 w-4 text-muted-foreground" />
+          ) : (
+            <Eye className="h-4 w-4 text-muted-foreground" />
+          )}
+        </Button>
+      </div>
+    </div>
+
+    <Button type="submit" className="w-full bg-gradient-to-r from-primary to-orange-600 hover:from-primary/90 hover:to-orange-600/90 transition-all duration-300 transform hover:scale-[1.02]" disabled={loading}>
+      {loading ? 'Signing in...' : 'Sign In'}
+    </Button>
+
+    <div className="mt-6 text-center">
+      <p className="text-sm text-muted-foreground">
+        Don't have an account?{' '}
+        <Link 
+          to={type === 'trade' ? '/trades/join' : '/join'} 
+          className="text-primary font-medium hover:underline"
+        >
+          Sign up as a {type === 'trade' ? 'Trade' : 'Customer'}
+        </Link>
+      </p>
+    </div>
+  </div>
+)
+
 const Login = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -43,71 +126,6 @@ const Login = () => {
       setJustLoggedIn(true)
     }
   }
-
-  const LoginForm = ({ type }: { type: string }) => (
-    <div className="space-y-4 pt-4">
-      <div className="space-y-2">
-        <Label htmlFor={`${type}-email`}>Email Address</Label>
-        <div className="relative">
-          <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            id={`${type}-email`}
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="name@example.com"
-            className="pl-9"
-            required
-          />
-        </div>
-      </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor={`${type}-password`}>Password</Label>
-        <div className="relative">
-          <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            id={`${type}-password`}
-            type={showPassword ? "text" : "password"}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter your password"
-            className="pl-9 pr-9"
-            required
-          />
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-            onClick={() => setShowPassword(!showPassword)}
-          >
-            {showPassword ? (
-              <EyeOff className="h-4 w-4 text-muted-foreground" />
-            ) : (
-              <Eye className="h-4 w-4 text-muted-foreground" />
-            )}
-          </Button>
-        </div>
-      </div>
-
-      <Button type="submit" className="w-full bg-gradient-to-r from-primary to-orange-600 hover:from-primary/90 hover:to-orange-600/90 transition-all duration-300 transform hover:scale-[1.02]" disabled={loading}>
-        {loading ? 'Signing in...' : 'Sign In'}
-      </Button>
-
-      <div className="mt-6 text-center">
-        <p className="text-sm text-muted-foreground">
-          Don't have an account?{' '}
-          <Link 
-            to={type === 'trade' ? '/trades/join' : '/join'} 
-            className="text-primary font-medium hover:underline"
-          >
-            Sign up as a {type === 'trade' ? 'Trade' : 'Customer'}
-          </Link>
-        </p>
-      </div>
-    </div>
-  )
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 bg-gradient-to-br from-secondary/5 via-background to-primary/5">
@@ -149,7 +167,16 @@ const Login = () => {
                     <h3 className="text-lg font-medium text-secondary">Customer Login</h3>
                     <p className="text-sm text-muted-foreground">Find and book trusted tradespeople</p>
                   </div>
-                  <LoginForm type="customer" />
+                  <LoginForm 
+                    type="customer"
+                    email={email}
+                    setEmail={setEmail}
+                    password={password}
+                    setPassword={setPassword}
+                    showPassword={showPassword}
+                    setShowPassword={setShowPassword}
+                    loading={loading}
+                  />
                 </form>
               </TabsContent>
 
@@ -159,7 +186,16 @@ const Login = () => {
                     <h3 className="text-lg font-medium text-secondary">Trade Professional</h3>
                     <p className="text-sm text-muted-foreground">Manage your business and leads</p>
                   </div>
-                  <LoginForm type="trade" />
+                  <LoginForm 
+                    type="trade"
+                    email={email}
+                    setEmail={setEmail}
+                    password={password}
+                    setPassword={setPassword}
+                    showPassword={showPassword}
+                    setShowPassword={setShowPassword}
+                    loading={loading}
+                  />
                 </form>
               </TabsContent>
             </Tabs>
